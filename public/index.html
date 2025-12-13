@@ -632,6 +632,173 @@
                 this.render();
             },
 
+            // --- Navigation ---
+            navigate(view) {
+                this.currentView = view;
+                this.render();
+                // Close sidebar on mobile if open
+                if (window.innerWidth < 768) {
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar && !sidebar.classList.contains('hidden')) {
+                        sidebar.classList.add('hidden');
+                    }
+                }
+            },
+
+            // --- Modals ---
+            openAddModal() {
+                document.getElementById('productForm').reset();
+                document.getElementById('productId').value = '';
+                document.getElementById('modalTitle').innerText = 'Nuevo Producto';
+                document.getElementById('productCategory').value = '';
+                document.getElementById('productBrand').innerHTML = '<option value="">Seleccionar Categoría primero</option>';
+                document.getElementById('sizeContainer').classList.add('hidden');
+
+                // Owner Assignment for Admin
+                const ownerContainer = document.getElementById('ownerAssignmentContainer');
+                const ownerSelect = document.getElementById('productOwnerSelect');
+
+                if (Store.state.user && Store.state.user.role === 'admin') {
+                    ownerContainer.classList.remove('hidden');
+                    ownerSelect.innerHTML = '<option value="">Seleccionar Local...</option>';
+
+                    // Hardcoded options as requested
+                    const options = [
+                        { id: 'emp1', name: 'Local De Ropa' },
+                        { id: 'emp2', name: 'Local De Celulares' }
+                    ];
+
+                    options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt.id;
+                        option.textContent = opt.name;
+                        ownerSelect.appendChild(option);
+                    });
+                } else {
+                    ownerContainer.classList.add('hidden');
+                }
+
+                document.getElementById('productModal').classList.remove('hidden');
+                this.populateCategories();
+            },
+
+            closeModal() {
+                document.getElementById('productModal').classList.add('hidden');
+            },
+
+            // --- Form Handling ---
+            populateCategories() {
+                const catSelect = document.getElementById('productCategory');
+                if (catSelect.options.length > 1) return; // Already populated
+
+                CATEGORIES.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    option.textContent = cat;
+                    catSelect.appendChild(option);
+                });
+            },
+
+            handleCategoryChange() {
+                const category = document.getElementById('productCategory').value;
+                const brandSelect = document.getElementById('productBrand');
+                const sizeContainer = document.getElementById('sizeContainer');
+                const sizeSelect = document.getElementById('productSizeSelect');
+                const sizeInput = document.getElementById('productSizeInput');
+
+                // 1. Populate Brands
+                brandSelect.innerHTML = '<option value="">Seleccionar...</option>';
+                const brands = BRANDS_BY_CATEGORY[category] || [];
+                brands.forEach(brand => {
+                    const option = document.createElement('option');
+                    option.value = brand;
+                    option.textContent = brand;
+                    brandSelect.appendChild(option);
+                });
+
+                // 2. Handle Size Field
+                if (CLOTHING_CATEGORIES.includes(category)) {
+                    sizeContainer.classList.remove('hidden');
+                    if (category === 'Tenis') {
+                        sizeSelect.classList.add('hidden');
+                        sizeInput.classList.remove('hidden');
+                        sizeInput.required = true;
+                        sizeSelect.required = false;
+                    } else {
+                        sizeSelect.classList.remove('hidden');
+                        sizeInput.classList.add('hidden');
+                        sizeSelect.required = true;
+                        sizeInput.required = false;
+                    }
+                } else {
+                    sizeContainer.classList.add('hidden');
+                    sizeSelect.required = false;
+                    sizeInput.required = false;
+                }
+            },
+
+            async saveProduct() {
+                const id = document.getElementById('productId').value;
+                const name = document.getElementById('productName').value;
+                const category = document.getElementById('productCategory').value;
+                const brand = document.getElementById('productBrand').value;
+                const model = document.getElementById('productModel').value;
+                const price = parseFloat(document.getElementById('productPrice').value);
+                const stock = parseInt(document.getElementById('productStock').value);
+
+                // Size Logic
+                let size = null;
+                if (!document.getElementById('sizeContainer').classList.contains('hidden')) {
+                    if (category === 'Tenis') {
+                        size = document.getElementById('productSizeInput').value;
+                    } else {
+                        size = document.getElementById('productSizeSelect').value;
+                    }
+                }
+
+                // Owner Logic
+                let owner = null;
+                let ownerName = null;
+
+                if (Store.state.user.role === 'admin') {
+                    const ownerSelect = document.getElementById('productOwnerSelect');
+                    const selectedOption = ownerSelect.options[ownerSelect.selectedIndex];
+                    if (ownerSelect.value) {
+                        owner = ownerSelect.value;
+                        ownerName = selectedOption.text;
+                    } else {
+                        Swal.fire({ icon: 'warning', title: 'Falta Asignar Local', text: 'Como admin, debes asignar el producto a un local.' });
+                        return;
+                    }
+                } else {
+                    // Employee: asigna a sí mismo
+                    owner = Store.state.user.id;
+                    ownerName = Store.state.user.name;
+                }
+
+                if (!name || !category || !brand || !price || isNaN(stock)) {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Completa los campos obligatorios' });
+                    return;
+                }
+
+                const productData = {
+                    name, category, brand, model, price, stock, size,
+                    owner, ownerName,
+                    updatedAt: new Date().toISOString()
+                };
+
+                if (id) {
+                    await Store.updateProduct({ id, ...productData });
+                    Swal.fire({ icon: 'success', title: 'Actualizado', timer: 1500, showConfirmButton: false });
+                } else {
+                    await Store.addProduct(productData);
+                    Swal.fire({ icon: 'success', title: 'Guardado', timer: 1500, showConfirmButton: false });
+                }
+
+                this.closeModal();
+                this.render();
+            },
+
             render() {
                 if (!Store.state.user) {
                     this.showLogin();
