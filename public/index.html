@@ -786,8 +786,19 @@
                     ownerName = Store.state.user.name;
                 }
 
-                if (!name || !category || !brand || !price || isNaN(stock)) {
-                    Swal.fire({ icon: 'error', title: 'Error', text: 'Completa los campos obligatorios' });
+                if (!category || !brand || category === "" || brand === "") {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atención',
+                        text: 'Verifique el campo de Categoria y Marca (No pueden quedar vacíos)',
+                        background: '#1e293b',
+                        color: '#fff'
+                    });
+                    return;
+                }
+
+                if (!name || !price || isNaN(stock)) {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Completa los campos obligatorios (Nombre, Precio, Stock)' });
                     return;
                 }
 
@@ -799,10 +810,10 @@
 
                 if (id) {
                     await Store.updateProduct({ id, ...productData });
-                    Swal.fire({ icon: 'success', title: 'Actualizado', timer: 1500, showConfirmButton: false });
+                    Swal.fire({ icon: 'success', title: 'Producto correctamente registrado', timer: 1500, showConfirmButton: false, background: '#1e293b', color: '#fff' });
                 } else {
                     await Store.addProduct(productData);
-                    Swal.fire({ icon: 'success', title: 'Guardado', timer: 1500, showConfirmButton: false });
+                    Swal.fire({ icon: 'success', title: 'Producto correctamente registrado', timer: 1500, showConfirmButton: false, background: '#1e293b', color: '#fff' });
                 }
 
                 this.closeModal();
