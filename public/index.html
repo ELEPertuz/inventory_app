@@ -522,8 +522,13 @@
             },
 
             async logout() {
-                await signOut(auth);
-                window.location.reload(); // Force reload to clear state and ensure Login UI shows immediately
+                try {
+                    await signOut(auth);
+                } catch (e) {
+                    console.error("Logout error:", e);
+                } finally {
+                    window.location.reload();
+                }
             },
 
             getVisibleProducts() {
@@ -1676,7 +1681,7 @@
 
         // Expose to window for HTML handlers
         window.UI = UI;
-        window.app = app;
+        window.app = UI; // Alias app to UI for HTML handlers
         window.Store = Store;
 
         // Start App
