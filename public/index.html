@@ -1,89 +1,1678 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+<html lang="es" class="dark">
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/12.6.0/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/12.6.0/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/12.6.0/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/12.6.0/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/12.6.0/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/12.6.0/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/12.6.0/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/12.6.0/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/12.6.0/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/12.6.0/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario Premium | Reparación Celulares</title>
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
-    </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- Tailwind Config for Custom Colors/Fonts -->
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                        },
+                        glass: {
+                            100: 'rgba(255, 255, 255, 0.1)',
+                            200: 'rgba(255, 255, 255, 0.2)',
+                        },
+                        accent: {
+                            blue: '#3b82f6',
+                            purple: '#8b5cf6',
+                            pink: '#ec4899',
+                            teal: '#14b8a6'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
         }
-      });
     </script>
-  </body>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            background-color: #0f172a;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(20, 184, 166, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: #f8fafc;
+        }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-hover:hover {
+            background: rgba(30, 41, 59, 0.9);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .glass-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .glass-input:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(51, 65, 85, 0.8);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(71, 85, 105, 1);
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(10px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .sidebar-link.active {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border-left: 3px solid #3b82f6;
+            color: #60a5fa;
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased h-screen flex overflow-hidden selection:bg-blue-500 selection:text-white">
+
+    <!-- Sidebar -->
+    <aside class="w-64 glass flex-shrink-0 flex flex-col transition-all duration-300 z-20 hidden md:flex" id="sidebar">
+        <div class="p-6 flex items-center gap-3 border-b border-white/5">
+            <div
+                class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i class="fas fa-microchip text-white text-sm"></i>
+            </div>
+            <h1
+                class="text-lg font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+                TechInventory</h1>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">Principal</p>
+
+            <a href="#" onclick="app.navigate('dashboard')"
+                class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all group">
+                <i class="fas fa-chart-pie w-5 group-hover:text-blue-400 transition-colors"></i>
+                <span class="font-medium">Dashboard</span>
+            </a>
+
+            <a href="#" onclick="app.navigate('inventory')"
+                class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all group">
+                <i class="fas fa-boxes-stacked w-5 group-hover:text-purple-400 transition-colors"></i>
+                <span class="font-medium">Inventario</span>
+            </a>
+
+            <a href="#" onclick="app.navigate('transactions')"
+                class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all group">
+                <i class="fas fa-history w-5 group-hover:text-pink-400 transition-colors"></i>
+                <span class="font-medium">Movimientos</span>
+            </a>
+
+            <a href="#" onclick="app.navigate('settings')"
+                class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all group">
+                <i class="fas fa-cog w-5 group-hover:text-gray-300 transition-colors"></i>
+                <span class="font-medium">Configuración</span>
+            </a>
+
+            <!-- Admin Only Link -->
+            <div id="adminLinks" class="hidden">
+                <a href="#" onclick="app.navigate('employees')"
+                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all group">
+                    <i class="fas fa-users-cog w-5 group-hover:text-blue-400 transition-colors"></i>
+                    <span class="font-medium">Empleados</span>
+                </a>
+            </div>
+
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3 px-3">Gestión</p>
+
+            <button onclick="app.openAddModal()" id="sidebarNewProdBtn"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-all group">
+                <i class="fas fa-plus w-5"></i>
+                <span class="font-medium">Nuevo Producto</span>
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-white/5" id="userProfileContainer">
+            <!-- User Profile Injected Here -->
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden relative" id="mainLayout">
+        <!-- Mobile Header -->
+        <header class="md:hidden glass h-16 flex items-center justify-between px-4 z-20">
+            <div class="flex items-center gap-3">
+                <button
+                    onclick="document.getElementById('sidebar').classList.toggle('hidden'); document.getElementById('sidebar').classList.toggle('absolute'); document.getElementById('sidebar').classList.toggle('h-full');"
+                    class="text-gray-400 hover:text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <span class="font-bold text-white">TechInventory</span>
+            </div>
+            <button onclick="app.openAddModal()"
+                class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
+                <i class="fas fa-plus text-sm"></i>
+            </button>
+        </header>
+
+        <!-- Views Container -->
+        <div id="app-content" class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+            <!-- Content injected by JS -->
+        </div>
+    </main>
+
+    <!-- Login View (Hidden by default) -->
+    <div id="loginView" class="fixed inset-0 z-50 bg-[#0f172a] flex items-center justify-center hidden">
+        <div
+            class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 blur-sm">
+        </div>
+        <div class="glass w-full max-w-md p-8 rounded-2xl shadow-2xl relative z-10 text-center space-y-8">
+            <div
+                class="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20 mx-auto">
+                <i class="fas fa-microchip text-white text-2xl"></i>
+            </div>
+
+            <div>
+                <h2 class="text-3xl font-bold text-white mb-2">Bienvenido</h2>
+                <p class="text-gray-400">Inicia sesión para gestionar tu inventario</p>
+            </div>
+
+            <div class="grid gap-4">
+                <!-- Login Button -->
+                <div class="space-y-6 mb-8">
+                    <p class="text-sm text-gray-400">Inicia sesión con tu cuenta de Google autorizada.</p>
+
+                    <button onclick="app.login()"
+                        class="w-full py-4 rounded-xl bg-white text-gray-900 font-bold shadow-lg hover:bg-gray-100 hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6 h-6"
+                            alt="Google">
+                        <span>Continuar con Google</span>
+                    </button>
+                </div>
+
+                <div class="p-4 rounded-xl bg-white/5 border border-white/10 text-xs text-left text-gray-400">
+                    <p class="font-bold text-gray-300 mb-2">⚠️ Configuración Requerida:</p>
+                    <p>Debes agregar tu correo de Gmail en el código (variable <code
+                            class="text-blue-400">USER_ROLES</code>) para que el sistema te reconozca como
+                        Administrador.</p>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-xs text-gray-500">
+            Al continuar, aceptas los <a href="#" class="text-blue-400 hover:underline">Términos de Servicio</a> y
+            la <a href="#" class="text-blue-400 hover:underline">Política de Privacidad</a>.
+        </p>
+    </div>
+    </div>
+
+    <!-- Add/Edit Product Modal -->
+    <div id="productModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="app.closeModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div
+                class="glass w-full max-w-2xl rounded-2xl shadow-2xl transform transition-all scale-100 flex flex-col max-h-[90vh]">
+                <div class="p-6 border-b border-white/10 flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-white" id="modalTitle">Nuevo Producto</h3>
+                    <button onclick="app.closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="p-6 overflow-y-auto custom-scrollbar">
+                    <form id="productForm" class="space-y-6">
+                        <input type="hidden" id="productId">
+
+                        <div class="space-y-2 md:col-span-2">
+                            <label class="text-sm font-medium text-gray-400">Nombre del Producto</label>
+                            <input type="text" id="productName" required
+                                class="w-full px-4 py-2.5 rounded-lg glass-input focus:ring-2 focus:ring-blue-500/50 transition-all"
+                                placeholder="Ej: Pantalla iPhone 13 / Camiseta Polo">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-400">Categoría</label>
+                            <select id="productCategory" required onchange="app.handleCategoryChange()"
+                                class="w-full px-4 py-2.5 rounded-lg glass-input focus:ring-2 focus:ring-blue-500/50 transition-all [&>option]:bg-slate-800">
+                                <option value="">Seleccionar...</option>
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-400">Marca</label>
+                            <select id="productBrand" required
+                                class="w-full px-4 py-2.5 rounded-lg glass-input focus:ring-2 focus:ring-blue-500/50 transition-all [&>option]:bg-slate-800">
+                                <option value="">Seleccionar Categoría primero</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-2 hidden" id="sizeContainer">
+                            <label class="text-sm font-medium text-gray-400">Talla</label>
+                            <!-- Drops for clothes -->
+                            <select id="productSizeSelect"
+                                class="w-full px-4 py-2.5 rounded-lg glass-input focus:ring-2 focus:ring-blue-500/50 transition-all [&>option]:bg-slate-800 hidden">
+                                <option value="XS">XS</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                                <option value="XXL">XXL</option>
+                                <option value="Unica">Única</option>
+                            </select>
+                            <!-- Input for Tenis -->
+                            <input type="text" id="productSizeInput"
+                                class="w-full px-4 py-2.5 rounded-lg glass-input focus:ring-2 focus:ring-blue-500/50 transition-all hidden"
+                                placeholder="Escribe la talla (Ej: 38, 40 EU, 7 US)">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-400">Modelo (Opcional)</label>
+                            <input type="text" id="productModel"
+                                class="w-full px-4 py-2.5 rounded-lg glass-input focus:ring-2 focus:ring-blue-500/50 transition-all"
+                                placeholder="Ej: S23 Ultra / Slim Fit">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-400">Precio Venta ($)</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-2.5 text-gray-500">$</span>
+                                <input type="number" id="productPrice" step="0.01" required
+                                    class="w-full pl-8 pr-4 py-2.5 rounded-lg glass-input focus:ring-2 focus:ring-emerald-500/50 transition-all"
+                                    placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-400">Stock Inicial</label>
+                            <input type="number" id="productStock" required
+                                class="w-full px-4 py-2.5 rounded-lg glass-input focus:ring-2 focus:ring-blue-500/50 transition-all"
+                                placeholder="0">
+                        </div>
+
+                        <!-- Admin Only: Assign Owner -->
+                        <div class="space-y-2 hidden" id="ownerAssignmentContainer">
+                            <label class="text-sm font-medium text-blue-400"><i class="fas fa-user-tag mr-2"></i>Asignar
+                                a Local (Admin)</label>
+                            <select id="productOwnerSelect"
+                                class="w-full px-4 py-2.5 rounded-lg glass-input border-blue-500/30 focus:ring-2 focus:ring-blue-500/50 transition-all [&>option]:bg-slate-800">
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+                </div>
+                </form>
+            </div>
+
+            <div class="p-6 border-t border-white/10 flex justify-end gap-3">
+                <button type="button" onclick="app.closeModal()"
+                    class="px-4 py-2 rounded-lg text-gray-300 hover:bg-white/5 transition-colors">Cancelar</button>
+                <button type="button" onclick="app.saveProduct()"
+                    class="px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-medium shadow-lg shadow-blue-500/25 transition-all transform hover:scale-105">
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5DKb2J1g1O6UQW_PHv65hB6ZOXLzUquY",
+            authDomain: "inventario-cac4a.firebaseapp.com",
+            projectId: "inventario-cac4a",
+            storageBucket: "inventario-cac4a.firebasestorage.app",
+            messagingSenderId: "413887763744",
+            appId: "1:413887763744:web:24025cc661193e65837345",
+            measurementId: "G-W12SX48C39"
+        };
+
+        // Initialize Firebase
+        const firebaseApp = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(firebaseApp);
+        const auth = getAuth(firebaseApp);
+        const db = getFirestore(firebaseApp);
+
+        // --- Role Mapping (Simple Auth) ---
+        // IMPORTANTE: REEMPLAZA LOS CORREOS CON TUS CUENTAS REALES DE GOOGLE
+        const USER_ROLES = {
+            'TU_CORREO_ADMIN@gmail.com': { role: 'admin', name: 'Administrador', id: 'admin' },
+            'TU_CORREO_ROPA@gmail.com': { role: 'employee', name: 'Local De Ropa', id: 'emp1' },
+            'TU_CORREO_CELULARES@gmail.com': { role: 'employee', name: 'Local De Celulares', id: 'emp2' },
+            // Manteign la cuenta de admin por defecto para pruebas si es necesario, o elimínala
+            'admin@techinventory.com': { role: 'admin', name: 'Administrador Test', id: 'admin' }
+        };
+
+        // --- Configuration ---
+        const CATEGORIES = [
+            'Celulares', 'Repuestos', 'Forros', 'Vídrios templados',
+            'Chaquetas', 'Buzos', 'Gorras', 'Camisetas',
+            'Maletas', 'Bolsos', 'Carteras', 'Sudaderas',
+            'Tenis', 'Pantalones', 'Joyeria', 'Perfumes',
+            'Gafas', 'Medias', 'Accesorios de celulares',
+            'Arboles de navidad', 'Brasieres', 'Bastones'
+        ];
+
+        const CLOTHING_CATEGORIES = [
+            'Chaquetas', 'Buzos', 'Gorras', 'Camisetas',
+            'Sudaderas', 'Tenis', 'Pantalones', 'Medias', 'Brasieres'
+        ];
+
+        const BRANDS_BY_CATEGORY = {
+            'Celulares': ['Samsung', 'Apple', 'Xiaomi', 'Huawei', 'Motorola', 'Honor', 'Oppo', 'Realme', 'Otros'],
+            'Repuestos': ['Original', 'Generico', 'AAA', 'OLED', 'LCD', 'Otros'],
+            'Forros': ['Generico', 'Original', 'Otterbox', 'Spigen', 'Nillkin', 'Ringke', 'Otros'],
+            'Vídrios templados': ['Generico', 'Matte', 'Ceramica', 'Privacidad', 'UV', 'Otros'],
+            'Chaquetas': ['Nike', 'Adidas', 'Puma', 'The North Face', 'Columbia', 'Zara', 'H&M', 'Otros'],
+            'Buzos': ['Nike', 'Adidas', 'Puma', 'Champion', 'Gap', 'Zara', 'H&M', 'Otros'],
+            'Gorras': ['New Era', 'Nike', 'Adidas', 'Puma', 'Goorin Bros', 'Fox', 'Otros'],
+            'Camisetas': ['Nike', 'Adidas', 'Puma', 'Zara', 'H&M', 'Arturo Calle', 'Otros'],
+            'Maletas': ['Totto', 'Samsonite', 'Nike', 'Adidas', 'JanSport', 'Otros'],
+            'Bolsos': ['Mario Hernandez', 'Coach', 'Michael Kors', 'Totto', 'Zara', 'Otros'],
+            'Carteras': ['Mario Hernandez', 'Velez', 'Totto', 'Zara', 'Otros'],
+            'Sudaderas': ['Nike', 'Adidas', 'Puma', 'Under Armour', 'Otros'],
+            'Tenis': ['Nike', 'Adidas', 'Jordan', 'Puma', 'Reebok', 'New Balance', 'Skechers', 'Otros'],
+            'Pantalones': ['Levi\'s', 'Diesel', 'Zara', 'H&M', 'Pull & Bear', 'Otros'],
+            'Joyeria': ['Acero', 'Plata', 'Oro Laminado', 'Pandora', 'Swarovski', 'Otros'],
+            'Perfumes': ['Carolina Herrera', 'Paco Rabanne', 'Versace', 'Calvin Klein', 'Hugo Boss', 'Nautica', 'Otros'],
+            'Gafas': ['Ray-Ban', 'Oakley', 'Carrera', 'Generico', 'Otros'],
+            'Medias': ['Punto Blanco', 'Nike', 'Adidas', 'Generico', 'Otros'],
+            'Accesorios de celulares': ['Apple', 'Samsung', 'Xiaomi', 'Anker', 'Belkin', 'Generico', 'Otros'],
+            'Arboles de navidad': ['Generico', 'Navidad', 'Otros'],
+            'Brasieres': ['Leonisa', 'Diane', 'Victoria\'s Secret', 'Generico', 'Otros'],
+            'Bastones': ['Generico', 'Ortopedico', 'Otros']
+        };
+
+        // --- Store (Data Management) ---
+        // --- Store (Data Management) ---
+        const Store = {
+            state: {
+                user: null, // { name, email, role, id, avatar }
+                products: [],
+                transactions: [],
+                registeredUsers: {} // Using USER_ROLES constant instead
+            },
+
+            init() {
+                // 1. Auth Listener
+                onAuthStateChanged(auth, (firebaseUser) => {
+                    if (firebaseUser) {
+                        const roleData = USER_ROLES[firebaseUser.email] || { role: 'employee', name: 'Usuario', id: 'unknown' };
+                        this.state.user = {
+                            email: firebaseUser.email,
+                            ...roleData,
+                            avatar: `https://ui-avatars.com/api/?name=${roleData.name.replace(/ /g, '+')}&background=random&color=fff`
+                        };
+                        console.log('User logged in:', this.state.user);
+
+                        // Start Listeners
+                        this.subscribeToData();
+
+                        app.navigate('dashboard');
+                    } else {
+                        this.state.user = null;
+                        this.state.products = [];
+                        this.state.transactions = [];
+                        app.showLogin();
+                    }
+                    UI.renderSidebarProfile(); // Update Profile UI
+                });
+            },
+
+            subscribeToData() {
+                // Products Listener
+                const qProducts = query(collection(db, "products"), orderBy("name"));
+                onSnapshot(qProducts, (snapshot) => {
+                    this.state.products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    UI.render(); // Real-time update
+                });
+
+                // Transactions Listener
+                const qTrans = query(collection(db, "transactions"), orderBy("date", "desc"));
+                onSnapshot(qTrans, (snapshot) => {
+                    this.state.transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), date: doc.data().date?.toDate() || new Date() }));
+                    UI.render();
+                });
+            },
+
+            // Auth Methods
+            async login() {
+                try {
+                    const provider = new GoogleAuthProvider();
+                    await signInWithPopup(auth, provider);
+                    // navigate handled by onAuthStateChanged
+                    return true;
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire({ icon: 'error', title: 'Error', text: error.message });
+                    return false;
+                }
+            },
+
+            async logout() {
+                await signOut(auth);
+                // Redirect handled by onAuthStateChanged
+            },
+
+            getVisibleProducts() {
+                if (!this.state.user) return [];
+                if (this.state.user.role === 'admin') return this.state.products;
+                return this.state.products.filter(p => p.owner === this.state.user.id);
+            },
+
+            // CRUD Operations
+            async addProduct(product) {
+                // owner/ownerName attached before calling this or inside?
+                // Ensure owner is set
+                product.owner = product.owner || (this.state.user ? this.state.user.id : 'unknown');
+                product.ownerName = product.ownerName || (this.state.user ? this.state.user.name : 'Unknown');
+
+                try {
+                    await addDoc(collection(db, "products"), product);
+                    this.logTransaction('Entrada', `Producto creado: ${product.name}`, product.stock);
+                } catch (e) {
+                    console.error("Error adding product: ", e);
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo guardar en la nube' });
+                }
+            },
+
+            async updateProduct(product) {
+                try {
+                    const docRef = doc(db, "products", String(product.id)); // Firestore IDs are strings
+                    await updateDoc(docRef, product);
+                } catch (e) {
+                    console.error("Error updating: ", e);
+                }
+            },
+
+            async deleteProduct(id) {
+                try {
+                    await deleteDoc(doc(db, "products", String(id)));
+                    this.logTransaction('Salida', 'Producto eliminado', 0);
+                } catch (e) {
+                    console.error("Error deleting: ", e);
+                }
+            },
+
+            async addStock(id, amount) {
+                const product = this.state.products.find(p => p.id === id);
+                if (product) {
+                    const newStock = product.stock + amount;
+                    await this.updateProduct({ ...product, stock: newStock });
+                    this.logTransaction('Entrada', `Stock agregado: ${product.name}`, amount);
+                }
+            },
+
+            async sellProduct(id, amount) {
+                const product = this.state.products.find(p => p.id === id);
+                if (product && product.stock >= amount) {
+                    const newStock = product.stock - amount;
+                    await this.updateProduct({ ...product, stock: newStock });
+                    this.logTransaction('Venta', `Venta: ${product.name}`, amount, product.price * amount);
+                }
+            },
+
+            async logTransaction(type, description, quantity, total = 0) {
+                try {
+                    await addDoc(collection(db, "transactions"), {
+                        type, description, quantity, total,
+                        date: serverTimestamp(),
+                        author: this.state.user ? this.state.user.name : 'Sistema'
+                    });
+                } catch (e) {
+                    console.error(e);
+                }
+            },
+
+            getStats() {
+                // Same logic, calculating from this.state.products (which is now live)
+                const visibleProducts = this.getVisibleProducts();
+                const totalStock = visibleProducts.reduce((sum, p) => sum + p.stock, 0);
+                const totalValue = visibleProducts.reduce((sum, p) => sum + (p.stock * p.price), 0);
+                const lowStock = visibleProducts.filter(p => p.stock < 5).length;
+
+                // Calculate stagnant (client side for now)
+                const threeWeeksAgo = new Date();
+                threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21);
+
+                // Transactions relevant to user
+                const userTransactions = this.state.user.role === 'admin'
+                    ? this.state.transactions
+                    : this.state.transactions.filter(t => t.author === this.state.user.name);
+
+                // Simple Check
+                const stagnantProducts = 0;
+                return { totalStock, totalProducts: visibleProducts.length, totalValue, lowStock, stagnantProducts };
+            }
+        };
+
+
+        // --- UI (Rendering) ---
+        const UI = {
+            currentView: 'dashboard',
+
+            init() {
+                this.render();
+            },
+
+            render() {
+                if (!Store.state.user) {
+                    this.showLogin();
+                    return;
+                }
+
+                this.hideLogin();
+                this.renderSidebarProfile();
+
+                const container = document.getElementById('app-content');
+                container.innerHTML = '';
+
+                if (this.currentView === 'dashboard') this.renderDashboard(container);
+                else if (this.currentView === 'inventory') this.renderInventory(container);
+                else if (this.currentView === 'stagnant') this.renderStagnantInventory(container);
+                else if (this.currentView === 'transactions') this.renderTransactions(container);
+                else if (this.currentView === 'stagnant') this.renderStagnantInventory(container);
+                else if (this.currentView === 'transactions') this.renderTransactions(container);
+                else if (this.currentView === 'settings') this.renderSettings(container);
+                else if (this.currentView === 'employees') this.renderEmployees(container);
+
+                this.updateActiveLink();
+            },
+
+            showLogin() {
+                document.getElementById('loginView').classList.remove('hidden');
+                document.getElementById('sidebar').classList.add('hidden'); // Ensure sidebar is hidden on mobile/desktop
+                document.getElementById('mainLayout').classList.add('blur-sm'); // Optional effect
+            },
+
+            hideLogin() {
+                document.getElementById('loginView').classList.add('hidden');
+                document.getElementById('sidebar').classList.remove('hidden');
+                document.getElementById('mainLayout').classList.remove('blur-sm');
+            },
+
+            renderSidebarProfile() {
+                const user = Store.state.user;
+                const container = document.getElementById('userProfileContainer');
+
+                // Toggle Admin Links
+                const adminLinks = document.getElementById('adminLinks');
+                const sidebarBtn = document.getElementById('sidebarNewProdBtn');
+
+                if (user) {
+                    if (user.role === 'admin') {
+                        if (adminLinks) adminLinks.classList.remove('hidden');
+                        if (sidebarBtn) sidebarBtn.classList.add('hidden'); // Hide New Btn
+                    } else {
+                        if (adminLinks) adminLinks.classList.add('hidden');
+                        if (sidebarBtn) sidebarBtn.classList.remove('hidden'); // Show New Btn
+                    }
+                }
+
+                if (!user) return;
+
+                container.innerHTML = `
+                    <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/5 border border-white/5">
+                        <img src="${user.avatar}" alt="Avatar" class="w-8 h-8 rounded-full border border-white/10">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-white truncate">${user.name}</p>
+                            <p class="text-xs text-gray-500 truncate">${user.email}</p>
+                        </div>
+                        <button onclick="app.logout()" class="text-gray-400 hover:text-red-400 transition-colors" title="Cerrar Sesión">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                `;
+            },
+
+            updateActiveLink() {
+                document.querySelectorAll('.sidebar-link').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('onclick').includes(this.currentView)) {
+                        link.classList.add('active');
+                    }
+                });
+            },
+
+            renderDashboard(container) {
+                const stats = Store.getStats();
+
+                const html = `
+                    <div class="fade-in space-y-6">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <h2 class="text-2xl font-bold text-white">Dashboard</h2>
+                                <p class="text-gray-400 text-sm">Resumen general de tu negocio</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-400">Valor Total Inventario</p>
+                                <p class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500">$${stats.totalValue.toLocaleString()}</p>
+                            </div>
+                        </div>
+
+                        <!-- KPI Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="glass p-6 rounded-2xl relative overflow-hidden group">
+                                <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl group-hover:bg-blue-500/30 transition-all"></div>
+                                <div class="relative">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div class="p-3 rounded-lg bg-blue-500/10 text-blue-400">
+                                            <i class="fas fa-boxes text-xl"></i>
+                                        </div>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-white/5 text-gray-300">Total Items</span>
+                                    </div>
+                                    <h3 class="text-3xl font-bold text-white mb-1">${stats.totalStock}</h3>
+                                    <p class="text-sm text-gray-400">${stats.totalProducts} productos únicos</p>
+                                </div>
+                            </div>
+
+                            <div class="glass p-6 rounded-2xl relative overflow-hidden group">
+                                <div class="absolute -right-6 -top-6 w-24 h-24 bg-pink-500/20 rounded-full blur-2xl group-hover:bg-pink-500/30 transition-all"></div>
+                                <div class="relative">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div class="p-3 rounded-lg bg-pink-500/10 text-pink-400">
+                                            <i class="fas fa-exclamation-triangle text-xl"></i>
+                                        </div>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/20">Atención</span>
+                                    </div>
+                                    <h3 class="text-3xl font-bold text-white mb-1">${stats.lowStock}</h3>
+                                    <p class="text-sm text-gray-400">Productos con stock bajo (< 5)</p>
+                                </div>
+                            </div>
+
+                            <div onclick="app.navigate('stagnant')" class="glass p-6 rounded-2xl relative overflow-hidden group cursor-pointer hover:bg-white/5 transition-all">
+                                <div class="absolute -right-6 -top-6 w-24 h-24 bg-orange-500/20 rounded-full blur-2xl group-hover:bg-orange-500/30 transition-all"></div>
+                                <div class="relative">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div class="p-3 rounded-lg bg-orange-500/10 text-orange-400">
+                                            <i class="fas fa-clock text-xl"></i>
+                                        </div>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20">Lento</span>
+                                    </div>
+                                    <h3 class="text-3xl font-bold text-white mb-1">${stats.stagnantProducts}</h3>
+                                    <p class="text-sm text-gray-400">Sin ventas (> 3 sem)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Section -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="glass p-6 rounded-2xl">
+                                <h3 class="text-lg font-semibold text-white mb-6">Progreso de Ventas (% Stock Vendido)</h3>
+                                <div id="chart-categories" class="h-64 flex items-center justify-center text-gray-500">Cargando gráfico...</div>
+                            </div>
+                            <div class="glass p-6 rounded-2xl">
+                                <h3 class="text-lg font-semibold text-white mb-6">Últimos Movimientos</h3>
+                                <div class="space-y-4">
+                                    ${Store.state.transactions
+                        .filter(t => Store.state.user.role === 'admin' || t.author === Store.state.user.name)
+                        .slice(0, 5).map(t => `
+                                        <div class="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 rounded-full flex items-center justify-center ${t.type === 'Venta' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400'}">
+                                                    <i class="fas ${t.type === 'Venta' ? 'fa-arrow-up' : 'fa-arrow-down'} text-xs"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-white">${t.description}</p>
+                                                    <p class="text-xs text-gray-500">${new Date(t.date).toLocaleDateString()}</p>
+                                                </div>
+                                            </div>
+                                            <span class="text-sm font-bold ${t.type === 'Venta' ? 'text-green-400' : 'text-white'}">
+                                                ${t.type === 'Venta' ? '+' : ''}${t.quantity}
+                                            </span>
+                                        </div>
+                                    `).join('') || '<p class="text-gray-500 text-sm text-center py-4">Sin movimientos recientes</p>'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML = html;
+                this.initCharts();
+            },
+
+            renderInventory(container) {
+                const html = `
+                    <div class="fade-in space-y-6 h-full flex flex-col">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <h2 class="text-2xl font-bold text-white">Inventario</h2>
+                                <p class="text-gray-400 text-sm">Gestiona tus productos y existencias</p>
+                            </div>
+                        </div>
+
+                        <div class="glass rounded-2xl overflow-hidden flex-1 flex flex-col">
+                            <div class="flex flex-col md:flex-row gap-3 p-4 border-b border-white/5 bg-white/5">
+                                <div class="relative flex-1">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-500"></i>
+                                    <input type="text" id="searchInput" onkeyup="UI.filterInventory()" placeholder="Buscar producto..." class="w-full pl-10 pr-4 py-2.5 rounded-lg glass-input focus:ring-2 focus:ring-blue-500/50 transition-all">
+                                </div>
+                                <div class="w-full md:w-64">
+                                     <select id="filterCategorySelect" onchange="UI.filterInventory()" class="w-full px-4 py-2.5 rounded-lg glass-input focus:ring-2 focus:ring-blue-500/50 transition-all [&>option]:bg-slate-800">
+                                        <option value="">Todas las Categorías</option>
+                                        ${CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('')}
+                                     </select>
+                                </div>
+                                ${Store.state.user.role !== 'admin' ? `
+                                <button onclick="app.openAddModal()" class="px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20 transition-all whitespace-nowrap">
+                                    <i class="fas fa-plus mr-2"></i> Nuevo
+                                </button>` : ''}
+                            </div>
+
+                            <div class="overflow-x-auto flex-1 custom-scrollbar">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="border-b border-white/10 bg-white/5 text-xs uppercase tracking-wider text-gray-400">
+                                            <th class="p-4 font-semibold">Producto</th>
+                                            <th class="p-4 font-semibold">Categoría</th>
+                                            <th class="p-4 font-semibold text-center">Stock</th>
+                                            <th class="p-4 font-semibold text-right">Precio</th>
+                                            ${Store.state.user.role !== 'admin' ? '<th class="p-4 font-semibold text-right">Acciones</th>' : ''}
+                                        </tr>
+                                    </thead>
+                                    <tbody id="inventoryTableBody" class="divide-y divide-white/5 text-sm">
+                                        <!-- Rows injected here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML = html;
+                this.renderInventoryRows(Store.getVisibleProducts());
+            },
+
+            renderInventoryRows(products) {
+                const tbody = document.getElementById('inventoryTableBody');
+                if (!tbody) return;
+
+                if (products.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500">No se encontraron productos</td></tr>`;
+                    return;
+                }
+
+                const isAdmin = Store.state.user && Store.state.user.role === 'admin';
+
+                tbody.innerHTML = products.map(p => `
+                    <tr class="hover:bg-white/5 transition-colors group">
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-gray-400 border border-white/5 overflow-hidden">
+                                    <i class="fas fa-box"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-white">${p.name}</p>
+                                    <p class="text-xs text-gray-500">${p.brand} ${p.model || ''} ${p.size ? ' | ' + p.size : ''}</p>
+                                    ${isAdmin ? `<p class="text-[10px] text-blue-400 mt-0.5"><i class="fas fa-user-tag text-[9px] mr-1"></i>${p.ownerName || p.owner || 'admin'}</p>` : ''}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-white/5 text-gray-300 border border-white/10">
+                                ${p.category}
+                            </span>
+                        </td>
+                        <td class="p-4 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <span class="font-bold ${p.stock < 5 ? 'text-red-400' : 'text-emerald-400'}">${p.stock}</span>
+                                ${p.stock < 5 ? '<i class="fas fa-exclamation-circle text-red-500 text-xs animate-pulse" title="Stock Bajo"></i>' : ''}
+                            </div>
+                        </td>
+                        <td class="p-4 text-right font-medium text-gray-300">
+                            $${Math.floor(parseFloat(p.price)).toLocaleString()}
+                        </td>
+                        ${!isAdmin ? `
+                        <td class="p-4 text-right">
+                            <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="app.quickAction(${p.id}, 'sell')" class="p-2 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20" title="Vender 1">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </button>
+                                <button onclick="app.quickAction(${p.id}, 'add')" class="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20" title="Agregar Stock">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button onclick="app.editProduct(${p.id})" class="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="app.deleteProduct(${p.id})" class="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>` : ''}
+                    </tr >
+            `).join('');
+            },
+
+            filterInventory() {
+                const term = document.getElementById('searchInput').value.toLowerCase();
+                const catFilter = document.getElementById('filterCategorySelect').value;
+                const visibleProducts = Store.getVisibleProducts();
+
+                const filtered = visibleProducts.filter(p => {
+                    const matchesTerm = p.name.toLowerCase().includes(term) ||
+                        p.brand.toLowerCase().includes(term) ||
+                        (p.model && p.model.toLowerCase().includes(term));
+                    const matchesCat = catFilter === '' || p.category === catFilter;
+                    return matchesTerm && matchesCat;
+                });
+                this.renderInventoryRows(filtered);
+            },
+
+            renderTransactions(container) {
+                const html = `
+            < div class="fade-in space-y-6" >
+                        <h2 class="text-2xl font-bold text-white">Historial de Movimientos</h2>
+                        <div class="glass rounded-2xl overflow-hidden">
+                            <table class="w-full text-left">
+                                <thead class="bg-white/5 text-xs uppercase text-gray-400">
+                                    <tr>
+                                        <th class="p-4">Fecha</th>
+                                        <th class="p-4">Tipo</th>
+                                        <th class="p-4">Descripción</th>
+                                        <th class="p-4 text-right">Cantidad</th>
+                                        <th class="p-4 text-right">Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/5 text-sm">
+                                    ${Store.state.transactions
+                        .filter(t => Store.state.user.role === 'admin' || t.author === Store.state.user.name)
+                        .map(t => `
+                                        <tr class="hover:bg-white/5">
+                                            <td class="p-4 text-gray-400">
+                                                <div class="flex flex-col">
+                                                    <span>${new Date(t.date).toLocaleString()}</span>
+                                                    <span class="text-xs text-blue-400">${t.author || 'Sistema'}</span>
+                                                </div>
+                                            </td>
+                                            <td class="p-4">
+                                                <span class="px-2 py-1 rounded text-xs font-bold ${t.type === 'Venta' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400'}">
+                                                    ${t.type}
+                                                </span>
+                                            </td>
+                                            <td class="p-4 text-white">${t.description}</td>
+                                            <td class="p-4 text-right text-white font-bold">${t.quantity}</td>
+                                            <td class="p-4 text-right text-gray-300">$${t.value ? t.value.toFixed(2) : '-'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div >
+            `;
+                container.innerHTML = html;
+            },
+
+            renderStagnantInventory(container) {
+                const stagnantProducts = Store.getStagnantProducts();
+                const html = `
+                    <div class="fade-in space-y-6 h-full flex flex-col">
+                        <div class="flex items-center gap-4">
+                            <button onclick="app.navigate('dashboard')" class="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <div>
+                                <h2 class="text-2xl font-bold text-white">Inventario Estancado</h2>
+                                <p class="text-gray-400 text-sm">Productos sin ventas en las últimas 3 semanas</p>
+                            </div>
+                        </div>
+
+                        <div class="glass rounded-2xl overflow-hidden flex-1 flex flex-col">
+                            <div class="overflow-x-auto flex-1 custom-scrollbar">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="border-b border-white/10 bg-white/5 text-xs uppercase tracking-wider text-gray-400">
+                                            <th class="p-4 font-semibold">Producto</th>
+                                            <th class="p-4 font-semibold">Categoría</th>
+                                            <th class="p-4 font-semibold text-center">Stock</th>
+                                            <th class="p-4 font-semibold text-right">Precio</th>
+                                            <th class="p-4 font-semibold text-right">Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="stagnantTableBody" class="divide-y divide-white/5 text-sm">
+                                        <!-- Rows injected here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML = html;
+
+                const tbody = document.getElementById('stagnantTableBody');
+                if (stagnantProducts.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500">¡Genial! No tienes productos estancados.</td></tr>`;
+                } else {
+                    tbody.innerHTML = stagnantProducts.map(p => `
+                        <tr class="hover:bg-white/5 transition-colors group">
+                            <td class="p-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-gray-400 border border-white/5 overflow-hidden">
+                                        <i class="fas fa-box"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-white">${p.name}</p>
+                                        <p class="text-xs text-gray-500">${p.brand} ${p.size ? ' | ' + p.size : ''}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-4">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-white/5 text-gray-300 border border-white/10">${p.category}</span>
+                            </td>
+                            <td class="p-4 text-center">
+                                <span class="font-bold text-white">${p.stock}</span>
+                            </td>
+                            <td class="p-4 text-right font-medium text-gray-300">
+                                $${parseFloat(p.price).toFixed(2)}
+                            </td>
+                            <td class="p-4 text-right">
+                                <span class="px-2 py-1 rounded text-xs font-bold bg-orange-500/20 text-orange-400 border border-orange-500/20">
+                                    Sin Movimiento
+                                </span>
+                            </td>
+                        </tr>
+            `).join('');
+                }
+            },
+
+            renderSettings(container) {
+                const html = `
+            < div class="fade-in space-y-6 max-w-2xl mx-auto" >
+                        <h2 class="text-2xl font-bold text-white">Configuración</h2>
+                        
+                        <!--Data Management-- >
+                        <div class="glass p-6 rounded-2xl space-y-6">
+                            <div class="flex items-center gap-4 border-b border-white/10 pb-4">
+                                <div class="p-3 rounded-lg bg-blue-500/10 text-blue-400">
+                                    <i class="fas fa-database text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white">Gestión de Datos</h3>
+                                    <p class="text-sm text-gray-400">Exporta o importa tu inventario para respaldarlo.</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <button onclick="Store.exportData()" class="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all group">
+                                    <i class="fas fa-download text-blue-400 group-hover:scale-110 transition-transform"></i>
+                                    <span class="text-white font-medium">Exportar Backup</span>
+                                </button>
+                                
+                                <label class="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all group cursor-pointer">
+                                    <i class="fas fa-upload text-purple-400 group-hover:scale-110 transition-transform"></i>
+                                    <span class="text-white font-medium">Importar Backup</span>
+                                    <input type="file" class="hidden" onchange="app.handleImport(this)">
+                                </label>
+                            </div>
+                        </div>
+
+                        <!--Danger Zone-- >
+            <div class="glass p-6 rounded-2xl space-y-6 border border-red-500/20">
+                <div class="flex items-center gap-4 border-b border-white/10 pb-4">
+                    <div class="p-3 rounded-lg bg-red-500/10 text-red-400">
+                        <i class="fas fa-exclamation-triangle text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Zona de Peligro</h3>
+                        <p class="text-sm text-gray-400">Acciones irreversibles.</p>
+                    </div>
+                </div>
+
+                <button onclick="app.logout()" class="w-full flex items-center justify-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-all mb-2">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="font-medium">Cerrar Sesión</span>
+                </button>
+
+                <button onclick="app.handleClearData()" class="w-full flex items-center justify-center gap-2 p-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all">
+                    <i class="fas fa-trash-alt"></i>
+                    <span class="font-medium">Borrar Todo el Inventario</span>
+                </button>
+            </div>
+                    </div >
+            `;
+                container.innerHTML = html;
+            },
+
+            initCharts() {
+                const visibleProducts = Store.getVisibleProducts();
+                const categoryStats = {};
+
+                // 1. Calculate Current Stock per Category
+                visibleProducts.forEach(p => {
+                    if (!categoryStats[p.category]) categoryStats[p.category] = { current: 0, sold: 0 };
+                    categoryStats[p.category].current += parseInt(p.stock);
+                });
+
+                // 2. Calculate Sold Stock from Transactions
+                // We attempt to match transactions to visible products
+                const userRole = Store.state.user.role;
+                Store.state.transactions.forEach(t => {
+                    if (t.type === 'Venta') {
+                        // Find which product this transaction belongs to. 
+                        // Currently transactions only have 'description'. 
+                        // Heuristic: Check if description contains product name AND check ownership if possible.
+                        // Since we don't track ID in transaction, we rely on name.
+                        // For private inventory: Only count if the product exists in visibleProducts
+
+                        const product = visibleProducts.find(p => t.description.includes(p.name));
+                        if (product) {
+                            if (!categoryStats[product.category]) categoryStats[product.category] = { current: 0, sold: 0 };
+                            categoryStats[product.category].sold += t.quantity;
+                        }
+                    }
+                });
+
+                // 3. Prepare Data for Chart
+                const categories = Object.keys(categoryStats);
+                const percentages = categories.map(cat => {
+                    const stats = categoryStats[cat];
+                    const total = stats.current + stats.sold;
+                    return total === 0 ? 0 : Math.round((stats.sold / total) * 100);
+                });
+
+                const options = {
+                    series: [{
+                        name: '% Vendido',
+                        data: percentages
+                    }],
+                    chart: {
+                        type: 'bar',
+                        height: 300,
+                        background: 'transparent',
+                        toolbar: { show: false },
+                        fontFamily: 'Inter, sans-serif'
+                    },
+                    plotOptions: {
+                        bar: {
+                            borderRadius: 4,
+                            horizontal: true,
+                            distributed: true // colorful bars
+                        }
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function (val) {
+                            return val + "%";
+                        }
+                    },
+                    xaxis: {
+                        categories: categories,
+                        max: 100,
+                        labels: {
+                            style: { colors: '#94a3b8' }
+                        }
+                    },
+                    yaxis: {
+                        labels: {
+                            style: { colors: '#fff' }
+                        }
+                    },
+                    theme: { mode: 'dark' },
+                    colors: ['#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f59e0b', '#ef4444', '#6366f1'],
+                    grid: {
+                        borderColor: '#334155'
+                    },
+                    tooltip: {
+                        theme: 'dark',
+                        y: {
+                            formatter: function (val) {
+                                return val + "% del stock total";
+                            }
+                        }
+                    }
+                };
+
+                // Clear previous chart if exists (not strictly needed as we re-render container, but good practice)
+                const chartEl = document.querySelector("#chart-categories");
+                chartEl.innerHTML = '';
+                const chart = new ApexCharts(chartEl, options);
+                chart.render();
+            }
+        };
+
+        // --- App Controller ---
+        const app = {
+            init() {
+                Store.init();
+                UI.init();
+                this.populateCategories();
+            },
+
+            populateCategories() {
+                const select = document.getElementById('productCategory');
+                if (!select) return;
+                select.innerHTML = '<option value="">Seleccionar...</option>';
+                CATEGORIES.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    option.textContent = cat;
+                    select.appendChild(option);
+                });
+            },
+
+            handleCategoryChange() {
+                const category = document.getElementById('productCategory').value;
+                const brandSelect = document.getElementById('productBrand');
+                const sizeContainer = document.getElementById('sizeContainer');
+                const sizeSelect = document.getElementById('productSizeSelect');
+                const sizeInput = document.getElementById('productSizeInput');
+
+                // Update Brands
+                brandSelect.innerHTML = '<option value="">Seleccionar...</option>';
+                if (category && BRANDS_BY_CATEGORY[category]) {
+                    BRANDS_BY_CATEGORY[category].forEach(brand => {
+                        const option = document.createElement('option');
+                        option.value = brand;
+                        option.textContent = brand;
+                        brandSelect.appendChild(option);
+                    });
+                } else if (category) {
+                    const option = document.createElement('option');
+                    option.value = 'Generico';
+                    option.textContent = 'Genérico';
+                    brandSelect.appendChild(option);
+                    const option2 = document.createElement('option');
+                    option2.value = 'Otros';
+                    option2.textContent = 'Otros';
+                    brandSelect.appendChild(option2);
+                }
+
+                // Toggle Size
+                if (CLOTHING_CATEGORIES.includes(category)) {
+                    sizeContainer.classList.remove('hidden');
+                    if (category === 'Tenis') {
+                        // Show Input, Hide Select
+                        sizeInput.classList.remove('hidden');
+                        sizeSelect.classList.add('hidden');
+                    } else {
+                        // Show Select, Hide Input
+                        sizeInput.classList.add('hidden');
+                        sizeSelect.classList.remove('hidden');
+                    }
+                } else {
+                    sizeContainer.classList.add('hidden');
+                }
+            },
+
+            navigate(view) {
+                UI.currentView = view;
+                UI.render();
+            },
+
+            openAddModal() {
+                document.getElementById('productForm').reset();
+                document.getElementById('productId').value = '';
+                document.getElementById('modalTitle').innerText = 'Nuevo Producto';
+
+                // Admin Assignment Logic
+                const ownerContainer = document.getElementById('ownerAssignmentContainer');
+                const ownerSelect = document.getElementById('productOwnerSelect');
+
+                if (Store.state.user.role === 'admin') {
+                    ownerContainer.classList.remove('hidden');
+                    ownerSelect.innerHTML = '<option value="">Seleccionar Local...</option>';
+
+                    // Add options: ONLY Locals
+                    const users = Store.state.registeredUsers;
+                    Object.keys(users).forEach(key => {
+                        if (users[key].role !== 'admin') {
+                            const option = document.createElement('option');
+                            option.value = key; // emp1 or emp2
+                            option.textContent = users[key].name; // 'Local De Ropa', etc.
+                            ownerSelect.appendChild(option);
+                        }
+                    });
+                } else {
+                    ownerContainer.classList.add('hidden');
+                }
+
+                const modal = document.getElementById('productModal');
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.querySelector('div.transform').classList.remove('scale-95', 'opacity-0'), 10);
+            },
+
+            closeModal() {
+                const modal = document.getElementById('productModal');
+                modal.classList.add('hidden');
+            },
+
+            saveProduct() {
+                const id = document.getElementById('productId').value;
+                // Determine Size value based on active input
+                let sizeValue = null;
+                const sizeContainer = document.getElementById('sizeContainer');
+                if (!sizeContainer.classList.contains('hidden')) {
+                    if (!document.getElementById('productSizeInput').classList.contains('hidden')) {
+                        sizeValue = document.getElementById('productSizeInput').value;
+                    } else {
+                        sizeValue = document.getElementById('productSizeSelect').value;
+                    }
+                }
+
+                const product = {
+                    name: document.getElementById('productName').value,
+                    category: document.getElementById('productCategory').value,
+                    brand: document.getElementById('productBrand').value,
+                    model: document.getElementById('productModel').value,
+                    price: parseFloat(document.getElementById('productPrice').value),
+                    stock: parseInt(document.getElementById('productStock').value),
+                    size: sizeValue,
+                };
+
+                // Admin Override with Validation
+                const ownerContainer = document.getElementById('ownerAssignmentContainer');
+                if (Store.state.user.role === 'admin' && !ownerContainer.classList.contains('hidden')) {
+                    const selectedOwnerId = document.getElementById('productOwnerSelect').value;
+
+                    if (!selectedOwnerId) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Requerido',
+                            text: 'Debes asignar un Local para el producto.',
+                            background: '#1e293b',
+                            color: '#fff'
+                        });
+                        return;
+                    }
+
+                    const selectedUser = Store.state.registeredUsers[selectedOwnerId];
+                    if (selectedUser) {
+                        product.owner = selectedOwnerId;
+                        product.ownerName = selectedUser.name;
+                    }
+                }
+
+                if (!product.name || !product.price) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Nombre y Precio son obligatorios',
+                        background: '#1e293b',
+                        color: '#fff'
+                    });
+                    return;
+                }
+
+                if (id) {
+                    product.id = parseInt(id);
+                    Store.updateProduct(product);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Actualizado',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        background: '#1e293b',
+                        color: '#fff'
+                    });
+                } else {
+                    Store.addProduct(product);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Guardado',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        background: '#1e293b',
+                        color: '#fff'
+                    });
+                }
+
+                this.closeModal();
+                UI.render(); // Refresh view
+            },
+
+            editProduct(id) {
+                const product = Store.state.products.find(p => p.id === id);
+                if (!product) return;
+
+                document.getElementById('productId').value = product.id;
+                document.getElementById('productName').value = product.name;
+
+                document.getElementById('productCategory').value = product.category;
+                this.handleCategoryChange(); // Populate brands and toggle size
+
+                document.getElementById('productBrand').value = product.brand;
+
+                document.getElementById('productModel').value = product.model;
+                document.getElementById('productPrice').value = product.price;
+                document.getElementById('productStock').value = product.stock;
+
+                if (product.size && !document.getElementById('sizeContainer').classList.contains('hidden')) {
+                    if (product.category === 'Tenis') {
+                        document.getElementById('productSizeInput').value = product.size;
+                    } else {
+                        document.getElementById('productSizeSelect').value = product.size;
+                    }
+                }
+
+                document.getElementById('modalTitle').innerText = 'Editar Producto';
+
+                const modal = document.getElementById('productModal');
+                modal.classList.remove('hidden');
+            },
+
+            deleteProduct(id) {
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "No podrás revertir esto",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#334155',
+                    confirmButtonText: 'Sí, eliminar',
+                    background: '#1e293b',
+                    color: '#fff'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Store.deleteProduct(id);
+                        UI.render();
+                        Swal.fire({
+                            title: 'Eliminado!',
+                            icon: 'success',
+                            background: '#1e293b',
+                            color: '#fff',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            },
+
+            quickAction(id, action) {
+                if (action === 'sell') {
+                    const success = Store.adjustStock(id, 1, 'sell');
+                    if (success) {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 2000,
+                            background: '#1e293b',
+                            color: '#fff'
+                        });
+                        Toast.fire({ icon: 'success', title: 'Venta registrada' });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Sin Stock',
+                            text: 'No quedan unidades de este producto',
+                            background: '#1e293b',
+                            color: '#fff'
+                        });
+                    }
+                } else if (action === 'add') {
+                    Store.adjustStock(id, 1, 'add');
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        background: '#1e293b',
+                        color: '#fff'
+                    });
+                    Toast.fire({ icon: 'success', title: 'Stock agregado' });
+                }
+                UI.render();
+            },
+
+            handleImport(input) {
+                const file = input.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const success = Store.importData(e.target.result);
+                    if (success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Importación Exitosa',
+                            text: 'Tus datos han sido restaurados.',
+                            background: '#1e293b',
+                            color: '#fff'
+                        });
+                        UI.render();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'El archivo no es válido.',
+                            background: '#1e293b',
+                            color: '#fff'
+                        });
+                    }
+                };
+                reader.readAsText(file);
+            },
+
+            handleClearData() {
+                Swal.fire({
+                    title: '¿Estás ABSOLUTAMENTE seguro?',
+                    text: "Esto borrará todos tus productos y movimientos. No se puede deshacer.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#334155',
+                    confirmButtonText: 'Sí, borrar todo',
+                    background: '#1e293b',
+                    color: '#fff'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Store.clearData();
+                        UI.render();
+                        Swal.fire({
+                            title: 'Datos Borrados',
+                            icon: 'success',
+                            background: '#1e293b',
+                            color: '#fff',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            },
+
+            renderEmployees(container) {
+                // Ensure only admin accesses this
+                if (Store.state.user.role !== 'admin') {
+                    app.navigate('dashboard');
+                    return;
+                }
+
+                const employees = ['Local De Ropa', 'Local De Celulares'];
+                const transactions = Store.state.transactions;
+
+                const getEmployeeStats = (empName) => {
+                    const empTrans = transactions.filter(t => t.author === empName);
+                    const salesCount = empTrans.filter(t => t.type === 'Venta').length;
+                    const salesValue = empTrans
+                        .filter(t => t.type === 'Venta')
+                        .reduce((acc, t) => acc + (t.value || 0), 0);
+                    const restocks = empTrans.filter(t => t.type === 'Reposición').length;
+                    const edits = empTrans.filter(t => t.type === 'Edición').length;
+                    return { empTrans, salesCount, salesValue, restocks, edits };
+                };
+
+                const html = `
+            < div class="fade-in space-y-6 h-full flex flex-col" >
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-2xl font-bold text-white">Actividad de Empleados</h2>
+                                <p class="text-gray-400 text-sm">Desempeño y registro de movimientos</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-0">
+                            ${employees.map(empName => {
+                    const stats = getEmployeeStats(empName);
+                    return `
+                                    <div class="glass p-6 rounded-2xl flex flex-col h-full max-h-[600px]">
+                                        <div class="flex items-center gap-4 mb-6">
+                                            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-purple-500/20">
+                                                ${empName.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <h3 class="font-bold text-white text-lg">${empName}</h3>
+                                                <p class="text-sm text-gray-400">
+                                                    <span class="text-green-400 font-medium">$${stats.salesValue.toLocaleString()}</span> vendidos
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div class="grid grid-cols-3 gap-3 mb-6">
+                                            <div class="p-3 rounded-xl bg-green-500/5 border border-green-500/10 flex flex-col items-center">
+                                                <span class="text-xl font-bold text-green-400">${stats.salesCount}</span>
+                                                <span class="text-[10px] text-gray-500 uppercase tracking-wider">Ventas</span>
+                                            </div>
+                                            <div class="p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 flex flex-col items-center">
+                                                <span class="text-xl font-bold text-blue-400">${stats.restocks}</span>
+                                                <span class="text-[10px] text-gray-500 uppercase tracking-wider">Stock</span>
+                                            </div>
+                                            <div class="p-3 rounded-xl bg-yellow-500/5 border border-yellow-500/10 flex flex-col items-center">
+                                                <span class="text-xl font-bold text-yellow-400">${stats.edits}</span>
+                                                <span class="text-[10px] text-gray-500 uppercase tracking-wider">Edits</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex-1 flex flex-col min-h-0">
+                                            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <i class="fas fa-history"></i> Historial Reciente
+                                            </h4>
+                                            <div class="flex-1 overflow-y-auto custom-scrollbar space-y-2 pr-2">
+                                                ${stats.empTrans.slice(0, 30).map(t => `
+                                                    <div class="flex items-center justify-between text-sm p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10 group">
+                                                        <div class="flex items-center gap-3 min-w-0">
+                                                            <div class="w-2 h-2 rounded-full flex-shrink-0 ${t.type === 'Venta' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' :
+                            t.type === 'Edición' ? 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]' :
+                                'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]'
+                        }"></div>
+                                                            <div class="flex flex-col min-w-0">
+                                                                <span class="text-gray-200 truncate font-medium">${t.description}</span>
+                                                                <span class="text-xs text-gray-500">${new Date(t.date).toLocaleDateString()} ${new Date(t.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                            </div>
+                                                        </div>
+                                                        ${t.value ? `<span class="text-xs font-bold text-gray-400 group-hover:text-white transition-colors">$${t.value}</span>` : ''}
+                                                    </div>
+                                                `).join('')}
+                                                ${stats.empTrans.length === 0 ? '<div class="h-full flex items-center justify-center text-sm text-gray-500 italic pb-8">Sin actividad registrada</div>' : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                }).join('')}
+                        </div>
+                    </div >
+            `;
+                container.innerHTML = html;
+            },
+
+            async login() {
+                // Show loading
+                const loadingToast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timerProgressBar: true,
+                    background: '#1e293b',
+                    color: '#fff'
+                });
+                loadingToast.fire({ icon: 'info', title: 'Conectando con Google...' });
+
+                await Store.login();
+            },
+
+            logout() {
+                Store.logout();
+            }
+        };
+
+        // Expose to window for HTML handlers
+        window.UI = UI;
+        window.app = app;
+        window.Store = Store;
+
+        // Start App
+        document.addEventListener('DOMContentLoaded', () => {
+            Store.init();
+        });
+    </script>
+    <p
+        style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">
+        Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo"
+            style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a
+            href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;"
+            target="_blank">DeepSite</a> - 🧬 <a href="https://enzostvs-deepsite.hf.space?remix=ele-oficial/techno"
+            style="color: #fff;text-decoration: underline;" target="_blank">Remix</a></p>
+</body>
+
 </html>
