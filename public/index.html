@@ -630,6 +630,7 @@
 
             init() {
                 this.render();
+                this.populateCategories(); // Ensure filter is populated on load
             },
 
             // --- Navigation ---
@@ -688,15 +689,24 @@
 
             // --- Form Handling ---
             populateCategories() {
+                // Modal Select
                 const catSelect = document.getElementById('productCategory');
-                if (catSelect.options.length > 1) return; // Already populated
+                // Filter Select
+                const filterSelect = document.getElementById('filterCategorySelect');
 
-                CATEGORIES.forEach(cat => {
-                    const option = document.createElement('option');
-                    option.value = cat;
-                    option.textContent = cat;
-                    catSelect.appendChild(option);
-                });
+                const populate = (select, includeAllOption) => {
+                    if (select.options.length > (includeAllOption ? 1 : 1)) return; // Already populated check
+
+                    CATEGORIES.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat;
+                        option.textContent = cat;
+                        select.appendChild(option);
+                    });
+                };
+
+                if (catSelect) populate(catSelect, false);
+                if (filterSelect) populate(filterSelect, true);
             },
 
             handleCategoryChange() {
