@@ -1574,6 +1574,7 @@
                 document.getElementById('productId').value = product.id;
                 document.getElementById('productName').value = product.name;
 
+                this.populateCategories(); // Ensure options exist
                 document.getElementById('productCategory').value = product.category;
                 this.handleCategoryChange(); // Populate brands and toggle size
 
