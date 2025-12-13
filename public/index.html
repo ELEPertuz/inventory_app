@@ -523,7 +523,7 @@
 
             async logout() {
                 await signOut(auth);
-                // Redirect handled by onAuthStateChanged
+                window.location.reload(); // Force reload to clear state and ensure Login UI shows immediately
             },
 
             getVisibleProducts() {
