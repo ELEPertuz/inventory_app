@@ -411,7 +411,7 @@
         // IMPORTANTE: REEMPLAZA LOS CORREOS CON TUS CUENTAS REALES DE GOOGLE
         const USER_ROLES = {
             'jor4012@gmail.com': { role: 'admin', name: 'Administrador', id: 'admin' },
-            'boutiquemono81@gmail.com': { role: 'employee', name: 'Local De Ropa', id: 'emp1' },
+            'TU_CORREO_ROPA@gmail.com': { role: 'employee', name: 'Local De Ropa', id: 'emp1' },
             'Tecnostoretecnologi@gmail.com': { role: 'employee', name: 'Local De Celulares', id: 'emp2' }
         };
 
@@ -1911,13 +1911,15 @@
             }
         };
 
-        // Expose to window for HTML handlers IMMEDIATELY
+        // Expose to window for HTML handlers
         window.UI = UI;
         window.app = UI; // Alias app to UI for HTML handlers
         window.Store = Store;
 
         // Start App
-        Store.init();
+        document.addEventListener('DOMContentLoaded', () => {
+            Store.init();
+        });
     </script>
 
 </body>
