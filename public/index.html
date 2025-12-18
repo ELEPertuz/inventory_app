@@ -139,6 +139,22 @@
             color: #60a5fa;
         }
     </style>
+
+    <script>
+        // Global login handler that waits for app to be ready
+        async function handleLogin() {
+            let attempts = 0;
+            while (!window.app || typeof window.app.login !== 'function') {
+                if (attempts++ > 50) {
+                    console.error('app.login no está disponible después de 5 segundos');
+                    alert('Error: La aplicación aún no está lista. Por favor, espera un momento e intenta de nuevo.');
+                    return;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            window.app.login();
+        }
+    </script>
 </head>
 
 <body class="font-sans antialiased h-screen flex overflow-hidden selection:bg-blue-500 selection:text-white">
@@ -250,7 +266,7 @@
                 <div class="space-y-6 mb-8">
                     <p class="text-sm text-gray-400">Inicia sesión con tu cuenta de Google autorizada.</p>
 
-                    <button onclick="app.login()"
+                    <button onclick="handleLogin()"
                         class="w-full py-4 rounded-xl bg-white text-gray-900 font-bold shadow-lg hover:bg-gray-100 hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6 h-6"
                             alt="Google">
