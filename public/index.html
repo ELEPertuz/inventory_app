@@ -1940,6 +1940,13 @@
                         Store.logout();
                     }
                 });
+            },
+
+            showLogin() {
+                // Show login view and hide main layout
+                document.getElementById('loginView').classList.remove('hidden');
+                document.getElementById('mainLayout').classList.add('hidden');
+                document.getElementById('sidebar').classList.add('hidden');
             }
         };
 
