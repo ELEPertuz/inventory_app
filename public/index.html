@@ -156,6 +156,20 @@
             // Call window.Store.login()
             window.Store.login();
         }
+
+        // Global logout handler that waits for Store to be ready
+        async function handleLogout() {
+            let attempts = 0;
+            while (!window.Store || typeof window.Store.logout !== 'function') {
+                if (attempts++ > 50) {
+                    console.error('Store.logout no está disponible después de 5 segundos');
+                    alert('Error: La aplicación aún no está lista. Por favor, espera un momento e intenta de nuevo.');
+                    return;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            window.Store.logout();
+        }
     </script>
 </head>
 
@@ -1347,7 +1361,7 @@
                     </div>
                 </div>
 
-                <button onclick="app.logout()" class="w-full flex items-center justify-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-all mb-2">
+                <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-all mb-2">
                     <i class="fas fa-sign-out-alt"></i>
                     <span class="font-medium">Cerrar Sesión</span>
                 </button>
