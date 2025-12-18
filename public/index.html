@@ -141,18 +141,20 @@
     </style>
 
     <script>
-        // Global login handler that waits for app to be ready
+        // Global login handler that waits for Store to be ready
         async function handleLogin() {
             let attempts = 0;
-            while (!window.app || typeof window.app.login !== 'function') {
+            // Check for window.Store and Store.login
+            while (!window.Store || typeof window.Store.login !== 'function') {
                 if (attempts++ > 50) {
-                    console.error('app.login no está disponible después de 5 segundos');
+                    console.error('Store.login no está disponible después de 5 segundos');
                     alert('Error: La aplicación aún no está lista. Por favor, espera un momento e intenta de nuevo.');
                     return;
                 }
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
-            window.app.login();
+            // Call window.Store.login()
+            window.Store.login();
         }
     </script>
 </head>
