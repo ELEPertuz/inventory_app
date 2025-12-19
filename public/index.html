@@ -607,7 +607,7 @@
             },
 
             async addStock(id, amount) {
-                const product = this.state.products.find(p => p.id === id);
+                const product = this.state.products.find(p => String(p.id) === String(id));
                 if (product) {
                     const newStock = product.stock + amount;
                     await this.updateProduct({ ...product, stock: newStock });
@@ -616,12 +616,24 @@
             },
 
             async sellProduct(id, amount) {
-                const product = this.state.products.find(p => p.id === id);
+                const product = this.state.products.find(p => String(p.id) === String(id));
                 if (product && product.stock >= amount) {
                     const newStock = product.stock - amount;
                     await this.updateProduct({ ...product, stock: newStock });
                     this.logTransaction('Venta', `Venta: ${product.name}`, amount, product.price * amount);
+                    return true;
                 }
+                return false;
+            },
+
+            async adjustStock(id, amount, action) {
+                if (action === 'add') {
+                    await this.addStock(id, amount);
+                    return true;
+                } else if (action === 'sell') {
+                    return await this.sellProduct(id, amount);
+                }
+                return false;
             },
 
             async logTransaction(type, description, quantity, total = 0) {
@@ -1149,16 +1161,16 @@
                         ${!isAdmin ? `
                         <td class="p-4 text-right">
                             <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onclick="app.quickAction(${p.id}, 'sell')" class="p-2 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20" title="Vender 1">
+                                <button onclick="app.quickAction('${p.id}', 'sell')" class="p-2 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20" title="Vender 1">
                                     <i class="fas fa-shopping-cart"></i>
                                 </button>
-                                <button onclick="app.quickAction(${p.id}, 'add')" class="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20" title="Agregar Stock">
+                                <button onclick="app.quickAction('${p.id}', 'add')" class="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20" title="Agregar Stock">
                                     <i class="fas fa-plus"></i>
                                 </button>
-                                <button onclick="app.editProduct(${p.id})" class="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10">
+                                <button onclick="app.editProduct('${p.id}')" class="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button onclick="app.deleteProduct(${p.id})" class="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20">
+                                <button onclick="app.deleteProduct('${p.id}')" class="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -1660,7 +1672,7 @@
                 }
 
                 if (id) {
-                    product.id = parseInt(id);
+                    product.id = id;
                     Store.updateProduct(product);
                     Swal.fire({
                         icon: 'success',
@@ -1687,7 +1699,7 @@
             },
 
             editProduct(id) {
-                const product = Store.state.products.find(p => p.id === id);
+                const product = Store.state.products.find(p => String(p.id) === String(id));
                 if (!product) return;
 
                 document.getElementById('productId').value = product.id;
@@ -1744,9 +1756,9 @@
                 });
             },
 
-            quickAction(id, action) {
+            async quickAction(id, action) {
                 if (action === 'sell') {
-                    const success = Store.adjustStock(id, 1, 'sell');
+                    const success = await Store.adjustStock(id, 1, 'sell');
                     if (success) {
                         const Toast = Swal.mixin({
                             toast: true,
@@ -1767,7 +1779,7 @@
                         });
                     }
                 } else if (action === 'add') {
-                    Store.adjustStock(id, 1, 'add');
+                    await Store.adjustStock(id, 1, 'add');
                     const Toast = Swal.mixin({
                         toast: true,
                         position: 'top-end',
