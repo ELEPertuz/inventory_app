@@ -637,10 +637,10 @@
                 return false;
             },
 
-            async logTransaction(type, description, quantity, total = 0) {
+            async logTransaction(type, description, quantity, value = 0) {
                 try {
                     await addDoc(collection(db, "transactions"), {
-                        type, description, quantity, total,
+                        type, description, quantity, value,
                         date: serverTimestamp(),
                         author: this.state.user ? this.state.user.name : 'Sistema',
                         authorId: this.state.user ? this.state.user.id : 'system'
@@ -1263,7 +1263,7 @@
                                             </td>
                                             <td class="p-4 text-white">${t.description}</td>
                                             <td class="p-4 text-right text-white font-bold">${t.quantity}</td>
-                                            <td class="p-4 text-right text-gray-300">$${t.value ? t.value.toFixed(2) : '-'}</td>
+                                            <td class="p-4 text-right text-gray-300">$${(t.value || t.total || 0).toLocaleString()}</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -1886,7 +1886,7 @@
                     const salesCount = empTrans.filter(t => t.type === 'Venta').length;
                     const salesValue = empTrans
                         .filter(t => t.type === 'Venta')
-                        .reduce((acc, t) => acc + (t.value || 0), 0);
+                        .reduce((acc, t) => acc + (t.value || t.total || 0), 0);
                     const restocks = empTrans.filter(t => t.type === 'Reposición').length;
                     const edits = empTrans.filter(t => t.type === 'Edición').length;
                     return { empTrans, salesCount, salesValue, restocks, edits };
@@ -1950,7 +1950,7 @@
                                                                 <span class="text-xs text-gray-500">${new Date(t.date).toLocaleDateString()} ${new Date(t.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                                             </div>
                                                         </div>
-                                                        ${t.value ? `<span class="text-xs font-bold text-gray-400 group-hover:text-white transition-colors">$${t.value}</span>` : ''}
+                                                        ${(t.value || t.total) ? `<span class="text-xs font-bold text-gray-400 group-hover:text-white transition-colors">$${(t.value || t.total).toLocaleString()}</span>` : ''}
                                                     </div>
                                                 `).join('')}
                                                 ${stats.empTrans.length === 0 ? '<div class="h-full flex items-center justify-center text-sm text-gray-500 italic pb-8">Sin actividad registrada</div>' : ''}
