@@ -501,7 +501,7 @@
                 // 1. Auth Listener
                 onAuthStateChanged(auth, (firebaseUser) => {
                     if (firebaseUser) {
-                        const roleData = USER_ROLES[firebaseUser.email] || { role: 'employee', name: 'Usuario', id: 'unknown' };
+                        const roleData = USER_ROLES[firebaseUser.email] || { role: 'employee', name: 'Sin Nombre', id: 'unknown' };
                         this.state.user = {
                             email: firebaseUser.email,
                             ...roleData,
@@ -1122,7 +1122,10 @@
                                 <div>
                                     <p class="font-medium text-white">${p.name}</p>
                                     <p class="text-xs text-gray-500">${p.brand} ${p.model || ''} ${p.size ? ' | ' + p.size : ''}</p>
-                                    ${isAdmin ? `<p class="text-[10px] text-blue-400 mt-0.5"><i class="fas fa-user-tag text-[9px] mr-1"></i>${p.ownerName || p.owner || 'admin'}</p>` : ''}
+                                    ${isAdmin ? `<p class="text-[10px] text-blue-400 mt-0.5">
+                                        <i class="fas fa-user-tag text-[9px] mr-1"></i>
+                                        ${p.owner === 'emp1' ? 'Local De Ropa' : (p.owner === 'emp2' ? 'Local De Celulares' : (p.ownerName && p.ownerName !== 'Usuario' ? p.ownerName : 'Administrador'))}
+                                    </p>` : ''}
                                 </div>
                             </div>
                         </td>
