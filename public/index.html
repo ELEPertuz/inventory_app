@@ -1996,12 +1996,17 @@
                         monthlyData[key] = {
                             total: 0,
                             count: 0,
+                            products: {},
                             month: date.toLocaleString('es-ES', { month: 'long' }),
                             year: date.getFullYear()
                         };
                     }
                     monthlyData[key].total += (t.value || t.total || 0);
                     monthlyData[key].count++;
+
+                    // Rastrear productos vendidos
+                    const productName = t.description.replace('Venta: ', '').replace('Venta ', '').trim();
+                    monthlyData[key].products[productName] = (monthlyData[key].products[productName] || 0) + (t.quantity || 1);
                 });
 
                 const sortedMonths = Object.keys(monthlyData).sort().reverse();
@@ -2019,43 +2024,64 @@
                         </div>
 
                         <div class="grid grid-cols-1 gap-6">
-                            <div class="glass overflow-hidden rounded-2xl">
-                                <table class="w-full text-left">
-                                    <thead class="bg-white/5 text-xs uppercase text-gray-400">
-                                        <tr>
-                                            <th class="p-4">Período</th>
-                                            <th class="p-4 text-center">Ventas Realizadas</th>
-                                            <th class="p-4 text-right">Total Ganado</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-white/5 text-sm">
-                                        ${sortedMonths.map(key => {
+                            <div class="glass overflow-hidden rounded-2xl border border-white/5 shadow-2xl">
+                            <table class="w-full text-left">
+                                <thead class="bg-white/5 text-[10px] uppercase text-gray-500 tracking-widest font-black">
+                                    <tr>
+                                        <th class="p-5">Mes</th>
+                                        <th class="p-5 text-center">Peak</th>
+                                        <th class="p-5">Top product</th>
+                                        <th class="p-5 text-right">VALOR</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/5">
+                                    ${sortedMonths.map(key => {
                     const data = monthlyData[key];
+
+                    // Lógica de Peak
+                    let peakLabel = 'Bajo';
+                    let peakClass = 'bg-red-500/10 text-red-400 border-red-500/20';
+                    if (data.total >= 2700000) {
+                        peakLabel = 'Alto';
+                        peakClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+                    } else if (data.total >= 2500000 || data.total > 1900000) {
+                        peakLabel = 'Intermedio';
+                        peakClass = 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+                    }
+
+                    // Lógica de TOP
+                    let topProduct = 'Sin ventas';
+                    let topQty = 0;
+                    Object.entries(data.products).forEach(([name, qty]) => {
+                        if (qty > topQty) {
+                            topQty = qty;
+                            topProduct = name;
+                        }
+                    });
+
                     return `
-                                                <tr class="hover:bg-white/5 transition-colors">
-                                                    <td class="p-4">
-                                                        <div class="flex items-center gap-3">
-                                                            <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
-                                                                <i class="fas fa-calendar-alt"></i>
-                                                            </div>
-                                                            <div>
-                                                                <p class="font-bold text-white capitalize">${data.month}</p>
-                                                                <p class="text-xs text-gray-500">${data.year}</p>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="p-4 text-center text-gray-300">
-                                                        <span class="px-2 py-1 rounded-full bg-white/5 border border-white/5">${data.count} ventas</span>
-                                                    </td>
-                                                    <td class="p-4 text-right">
-                                                        <span class="text-lg font-bold text-emerald-400">$${data.total.toLocaleString()}</span>
-                                                    </td>
-                                                </tr>
-                                            `;
-                }).join('') || '<tr><td colspan="3" class="p-8 text-center text-gray-500 italic">No hay transacciones de venta registradas</td></tr>'}
-                                    </tbody>
-                                </table>
-                            </div>
+                                            <tr class="hover:bg-white/[0.02] transition-colors text-sm">
+                                                <td class="p-5 text-white font-bold capitalize">${data.month} ${data.year}</td>
+                                                <td class="p-5 text-center">
+                                                    <span class="px-3 py-1 rounded-full text-[10px] font-black border uppercase ${peakClass}">
+                                                        ${peakLabel}
+                                                    </span>
+                                                </td>
+                                                <td class="p-5 text-gray-300">
+                                                    <div class="flex items-center gap-2 font-medium">
+                                                        <span>${topProduct}</span>
+                                                        <span class="text-[10px] text-gray-500">(${topQty} uds)</span>
+                                                    </div>
+                                                </td>
+                                                <td class="p-5 text-right font-black text-emerald-400 text-lg">
+                                                    $${data.total.toLocaleString()}
+                                                </td>
+                                            </tr>
+                                        `;
+                }).join('') || '<tr><td colspan="4" class="p-10 text-center text-gray-500 italic font-bold">Sin datos registrados</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
                         </div>
                     </div>
                 `;
