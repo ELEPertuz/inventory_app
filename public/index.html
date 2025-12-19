@@ -443,7 +443,7 @@
         // IMPORTANTE: REEMPLAZA LOS CORREOS CON TUS CUENTAS REALES DE GOOGLE
         const USER_ROLES = {
             'jor4012@gmail.com': { role: 'admin', name: 'Administrador', id: 'admin' },
-            'TU_CORREO_ROPA@gmail.com': { role: 'employee', name: 'Local De Ropa', id: 'emp1' },
+            'boutiquemono81@gmail.com': { role: 'employee', name: 'Local De Ropa', id: 'emp1' },
             'Tecnostoretecnologi@gmail.com': { role: 'employee', name: 'Local De Celulares', id: 'emp2' }
         };
 
@@ -626,7 +626,8 @@
                     await addDoc(collection(db, "transactions"), {
                         type, description, quantity, total,
                         date: serverTimestamp(),
-                        author: this.state.user ? this.state.user.name : 'Sistema'
+                        author: this.state.user ? this.state.user.name : 'Sistema',
+                        authorId: this.state.user ? this.state.user.id : 'system'
                     });
                 } catch (e) {
                     console.error(e);
@@ -634,24 +635,28 @@
             },
 
             getStats() {
-                // Same logic, calculating from this.state.products (which is now live)
                 const visibleProducts = this.getVisibleProducts();
                 const totalStock = visibleProducts.reduce((sum, p) => sum + p.stock, 0);
                 const totalValue = visibleProducts.reduce((sum, p) => sum + (p.stock * p.price), 0);
                 const lowStock = visibleProducts.filter(p => p.stock < 5).length;
+                const stagnantProducts = this.getStagnantProducts().length;
 
-                // Calculate stagnant (client side for now)
+                return { totalStock, totalProducts: visibleProducts.length, totalValue, lowStock, stagnantProducts };
+            },
+
+            getStagnantProducts() {
+                const visibleProducts = this.getVisibleProducts();
                 const threeWeeksAgo = new Date();
                 threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21);
 
-                // Transactions relevant to user
-                const userTransactions = this.state.user.role === 'admin'
-                    ? this.state.transactions
-                    : this.state.transactions.filter(t => t.author === this.state.user.name);
+                return visibleProducts.filter(p => {
+                    const sales = this.state.transactions
+                        .filter(t => t.type === 'Venta' && t.description.includes(p.name) && (this.state.user.role === 'admin' || t.authorId === this.state.user.id))
+                        .sort((a, b) => b.date - a.date);
 
-                // Simple Check
-                const stagnantProducts = 0;
-                return { totalStock, totalProducts: visibleProducts.length, totalValue, lowStock, stagnantProducts };
+                    if (sales.length === 0) return true;
+                    return sales[0].date < threeWeeksAgo;
+                });
             }
         };
 
@@ -1011,7 +1016,7 @@
                                 <h3 class="text-lg font-semibold text-white mb-6">Últimos Movimientos</h3>
                                 <div class="space-y-4">
                                     ${Store.state.transactions
-                        .filter(t => Store.state.user.role === 'admin' || t.author === Store.state.user.name)
+                        .filter(t => Store.state.user.role === 'admin' || t.authorId === Store.state.user.id)
                         .slice(0, 5).map(t => `
                                         <div class="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
                                             <div class="flex items-center gap-3">
@@ -1223,7 +1228,7 @@
                                 </thead>
                                 <tbody class="divide-y divide-white/5 text-sm">
                                     ${Store.state.transactions
-                        .filter(t => Store.state.user.role === 'admin' || t.author === Store.state.user.name)
+                        .filter(t => Store.state.user.role === 'admin' || t.authorId === Store.state.user.id)
                         .map(t => `
                                         <tr class="hover:bg-white/5">
                                             <td class="p-4 text-gray-400">
