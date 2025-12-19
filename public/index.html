@@ -907,8 +907,6 @@
                 else if (this.currentView === 'inventory') this.renderInventory(container);
                 else if (this.currentView === 'stagnant') this.renderStagnantInventory(container);
                 else if (this.currentView === 'transactions') this.renderTransactions(container);
-                else if (this.currentView === 'stagnant') this.renderStagnantInventory(container);
-                else if (this.currentView === 'transactions') this.renderTransactions(container);
                 else if (this.currentView === 'settings') this.renderSettings(container);
                 else if (this.currentView === 'employees') this.renderEmployees(container);
                 else if (this.currentView === 'earningsHistory') this.renderEarningsHistory(container);
@@ -970,7 +968,8 @@
             updateActiveLink() {
                 document.querySelectorAll('.sidebar-link').forEach(link => {
                     link.classList.remove('active');
-                    if (link.getAttribute('onclick').includes(this.currentView)) {
+                    const onclick = link.getAttribute('onclick');
+                    if (onclick && onclick.includes(this.currentView)) {
                         link.classList.add('active');
                     }
                 });
@@ -1986,32 +1985,34 @@
                     return;
                 }
 
-                const transactions = Store.state.transactions.filter(t => t.type === 'Venta');
-                const monthlyData = {};
+                try {
+                    const transactions = Store.state.transactions.filter(t => t.type === 'Venta');
+                    const monthlyData = {};
 
-                transactions.forEach(t => {
-                    const date = new Date(t.date);
-                    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                    if (!monthlyData[key]) {
-                        monthlyData[key] = {
-                            total: 0,
-                            count: 0,
-                            products: {},
-                            month: date.toLocaleString('es-ES', { month: 'long' }),
-                            year: date.getFullYear()
-                        };
-                    }
-                    monthlyData[key].total += (t.value || t.total || 0);
-                    monthlyData[key].count++;
+                    transactions.forEach(t => {
+                        const date = t.date ? new Date(t.date) : new Date();
+                        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                        if (!monthlyData[key]) {
+                            monthlyData[key] = {
+                                total: 0,
+                                count: 0,
+                                products: {},
+                                month: date.toLocaleString('es-ES', { month: 'long' }),
+                                year: date.getFullYear()
+                            };
+                        }
+                        monthlyData[key].total += (parseFloat(t.value) || parseFloat(t.total) || 0);
+                        monthlyData[key].count++;
 
-                    // Rastrear productos vendidos
-                    const productName = t.description.replace('Venta: ', '').replace('Venta ', '').trim();
-                    monthlyData[key].products[productName] = (monthlyData[key].products[productName] || 0) + (t.quantity || 1);
-                });
+                        // Rastrear productos vendidos
+                        const desc = t.description || 'Producto desconocido';
+                        const productName = desc.replace('Venta: ', '').replace('Venta ', '').trim();
+                        monthlyData[key].products[productName] = (monthlyData[key].products[productName] || 0) + (parseInt(t.quantity) || 1);
+                    });
 
-                const sortedMonths = Object.keys(monthlyData).sort().reverse();
+                    const sortedMonths = Object.keys(monthlyData).sort().reverse();
 
-                const html = `
+                    const html = `
                     <div class="fade-in space-y-6">
                         <div class="flex items-center gap-4">
                             <button onclick="app.navigate('dashboard')" class="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
@@ -2036,30 +2037,30 @@
                                 </thead>
                                 <tbody class="divide-y divide-white/5">
                                     ${sortedMonths.map(key => {
-                    const data = monthlyData[key];
+                        const data = monthlyData[key];
 
-                    // Lógica de Peak
-                    let peakLabel = 'Bajo';
-                    let peakClass = 'bg-red-500/10 text-red-400 border-red-500/20';
-                    if (data.total >= 2700000) {
-                        peakLabel = 'Alto';
-                        peakClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-                    } else if (data.total >= 2500000 || data.total > 1900000) {
-                        peakLabel = 'Intermedio';
-                        peakClass = 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
-                    }
-
-                    // Lógica de TOP
-                    let topProduct = 'Sin ventas';
-                    let topQty = 0;
-                    Object.entries(data.products).forEach(([name, qty]) => {
-                        if (qty > topQty) {
-                            topQty = qty;
-                            topProduct = name;
+                        // Lógica de Peak
+                        let peakLabel = 'Bajo';
+                        let peakClass = 'bg-red-500/10 text-red-400 border-red-500/20';
+                        if (data.total >= 2700000) {
+                            peakLabel = 'Alto';
+                            peakClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+                        } else if (data.total > 1900000) {
+                            peakLabel = 'Intermedio';
+                            peakClass = 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
                         }
-                    });
 
-                    return `
+                        // Lógica de TOP
+                        let topProduct = 'Sin ventas';
+                        let topQty = 0;
+                        Object.entries(data.products).forEach(([name, qty]) => {
+                            if (qty > topQty) {
+                                topQty = qty;
+                                topProduct = name;
+                            }
+                        });
+
+                        return `
                                             <tr class="hover:bg-white/[0.02] transition-colors text-sm">
                                                 <td class="p-5 text-white font-bold capitalize">${data.month} ${data.year}</td>
                                                 <td class="p-5 text-center">
@@ -2078,14 +2079,27 @@
                                                 </td>
                                             </tr>
                                         `;
-                }).join('') || '<tr><td colspan="4" class="p-10 text-center text-gray-500 italic font-bold">Sin datos registrados</td></tr>'}
+                    }).join('') || '<tr><td colspan="4" class="p-10 text-center text-gray-500 italic font-bold">Sin datos registrados</td></tr>'}
                                 </tbody>
                             </table>
                         </div>
                         </div>
                     </div>
                 `;
-                container.innerHTML = html;
+                    container.innerHTML = html;
+                } catch (error) {
+                    console.error("Error in renderEarningsHistory:", error);
+                    container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center p-20 text-center space-y-4">
+                            <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 text-2xl">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">Error al cargar historial</h3>
+                            <p class="text-gray-400 max-w-sm">Hubo un problema procesando los datos de ventas. Por favor, intenta recargar la página.</p>
+                            <button onclick="location.reload()" class="px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-white/10">Recargar Sistema</button>
+                        </div>
+                    `;
+                }
             },
 
             async login() {
