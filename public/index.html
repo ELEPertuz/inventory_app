@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventario Premium | Reparación Celulares</title>
 
-    <!-- Libraries -->
+    <!-- Librerías -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Tailwind Config for Custom Colors/Fonts -->
+    <!-- Configuración de Tailwind para Colores/Fuentes Personalizados -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -57,7 +57,7 @@
             color: #f8fafc;
         }
 
-        /* Glassmorphism Utilities */
+        /* Utilidades de Glassmorphism */
         .glass {
             background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(12px);
@@ -83,7 +83,7 @@
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
-        /* Custom Scrollbar */
+        /* Barra de Desplazamiento Personalizada */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -102,7 +102,7 @@
             background: rgba(71, 85, 105, 1);
         }
 
-        /* Animations */
+        /* Animaciones */
         .fade-in {
             animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -141,10 +141,10 @@
     </style>
 
     <script>
-        // Global login handler that waits for Store to be ready
+        // Manejador de login global que espera a que el Store esté listo
         async function handleLogin() {
             let attempts = 0;
-            // Check for window.Store and Store.login
+            // Verificar window.Store y Store.login
             while (!window.Store || typeof window.Store.login !== 'function') {
                 if (attempts++ > 50) {
                     console.error('Store.login no está disponible después de 5 segundos');
@@ -153,11 +153,11 @@
                 }
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
-            // Call window.Store.login()
+            // Llamar a window.Store.login()
             window.Store.login();
         }
 
-        // Global logout handler that waits for Store to be ready
+        // Manejador de logout global que espera a que el Store esté listo
         async function handleLogout() {
             let attempts = 0;
             while (!window.Store || typeof window.Store.logout !== 'function') {
@@ -175,7 +175,7 @@
 
 <body class="font-sans antialiased h-screen flex overflow-hidden selection:bg-blue-500 selection:text-white">
 
-    <!-- Sidebar -->
+    <!-- Barra Lateral -->
     <aside class="w-64 glass flex-shrink-0 flex flex-col transition-all duration-300 z-20 hidden" id="sidebar">
         <div class="p-6 flex items-center gap-3 border-b border-white/5">
             <div
@@ -214,7 +214,7 @@
                 <span class="font-medium">Configuración</span>
             </a>
 
-            <!-- Admin Only Link -->
+            <!-- Enlace solo para Administradores -->
             <div id="adminLinks" class="hidden">
                 <a href="#" onclick="app.navigate('employees')"
                     class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all group">
@@ -233,13 +233,13 @@
         </nav>
 
         <div class="p-4 border-t border-white/5" id="userProfileContainer">
-            <!-- User Profile Injected Here -->
+            <!-- El Perfil de Usuario se inyecta aquí -->
         </div>
     </aside>
 
-    <!-- Main Content -->
+    <!-- Contenido Principal -->
     <main class="flex-1 flex flex-col min-w-0 overflow-hidden relative hidden" id="mainLayout">
-        <!-- Mobile Header -->
+        <!-- Cabecera Móvil -->
         <header class="md:hidden glass h-16 flex items-center justify-between px-4 z-20">
             <div class="flex items-center gap-3">
                 <button
@@ -255,13 +255,13 @@
             </button>
         </header>
 
-        <!-- Views Container -->
+        <!-- Contenedor de Vistas -->
         <div id="app-content" class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
-            <!-- Content injected by JS -->
+            <!-- Contenido inyectado por JS -->
         </div>
     </main>
 
-    <!-- Login View (Visible by default) -->
+    <!-- Vista de Login (Visible por defecto) -->
     <div id="loginView" class="fixed inset-0 z-50 bg-[#0f172a] flex items-center justify-center">
         <div
             class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 blur-sm">
@@ -278,7 +278,7 @@
             </div>
 
             <div class="grid gap-4">
-                <!-- Login Button -->
+                <!-- Botón de Login -->
                 <div class="space-y-6 mb-8">
                     <p class="text-sm text-gray-400">Inicia sesión con tu cuenta de Google autorizada.</p>
 
@@ -306,7 +306,7 @@
     </div>
     </div>
 
-    <!-- Add/Edit Product Modal -->
+    <!-- Modal para Agregar/Editar Producto -->
     <div id="productModal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="app.closeModal()"></div>
         <div class="absolute inset-0 flex items-center justify-center p-4">
@@ -335,7 +335,7 @@
                             <select id="productCategory" required onchange="app.handleCategoryChange()"
                                 class="w-full px-4 py-2.5 rounded-lg glass-input focus:ring-2 focus:ring-blue-500/50 transition-all [&>option]:bg-slate-800">
                                 <option value="">Seleccionar...</option>
-                                <!-- Populated by JS -->
+                                <!-- Autocompletado por JS -->
                             </select>
                         </div>
 
@@ -349,7 +349,7 @@
 
                         <div class="space-y-2 hidden" id="sizeContainer">
                             <label class="text-sm font-medium text-gray-400">Talla</label>
-                            <!-- Drops for clothes -->
+                            <!-- Opciones para ropa -->
                             <select id="productSizeSelect"
                                 class="w-full px-4 py-2.5 rounded-lg glass-input focus:ring-2 focus:ring-blue-500/50 transition-all [&>option]:bg-slate-800 hidden">
                                 <option value="XS">XS</option>
@@ -360,7 +360,7 @@
                                 <option value="XXL">XXL</option>
                                 <option value="Unica">Única</option>
                             </select>
-                            <!-- Input for Tenis -->
+                            <!-- Entrada para Tenis -->
                             <input type="text" id="productSizeInput"
                                 class="w-full px-4 py-2.5 rounded-lg glass-input focus:ring-2 focus:ring-blue-500/50 transition-all hidden"
                                 placeholder="Escribe la talla (Ej: 38, 40 EU, 7 US)">
@@ -390,7 +390,7 @@
                                 placeholder="0">
                         </div>
 
-                        <!-- Admin Only: Assign Owner -->
+                        <!-- Solo Admin: Asignar Propietario -->
                         <div class="space-y-2 hidden" id="ownerAssignmentContainer">
                             <label class="text-sm font-medium text-blue-400"><i class="fas fa-user-tag mr-2"></i>Asignar
                                 a Local (Admin)</label>
@@ -415,14 +415,14 @@
     </div>
     </div>
 
-    <!-- Application Logic -->
+    <!-- Lógica de la Aplicación -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // --- Firebase Configuration ---
+        // --- Configuración de Firebase ---
         const firebaseConfig = {
             apiKey: "AIzaSyD5DKb2J1g1O6UQW_PHv65hB6ZOXLzUquY",
             authDomain: "inventario-cac4a.firebaseapp.com",
@@ -433,13 +433,13 @@
             measurementId: "G-W12SX48C39"
         };
 
-        // Initialize Firebase
+        // Inicializar Firebase
         const firebaseApp = initializeApp(firebaseConfig);
         const analytics = getAnalytics(firebaseApp);
         const auth = getAuth(firebaseApp);
         const db = getFirestore(firebaseApp);
 
-        // --- Role Mapping (Simple Auth) ---
+        // --- Mapeo de Roles (Autenticación Simple) ---
         // IMPORTANTE: REEMPLAZA LOS CORREOS CON TUS CUENTAS REALES DE GOOGLE
         const USER_ROLES = {
             'jor4012@gmail.com': { role: 'admin', name: 'Administrador', id: 'admin' },
@@ -447,7 +447,7 @@
             'Tecnostoretecnologi@gmail.com': { role: 'employee', name: 'Local De Celulares', id: 'emp2' }
         };
 
-        // --- Configuration ---
+        // --- Configuración ---
         const CATEGORIES = [
             'Celulares', 'Repuestos', 'Forros', 'Vídrios templados',
             'Chaquetas', 'Buzos', 'Gorras', 'Camisetas',
@@ -488,17 +488,17 @@
         };
 
         // --- Store (Data Management) ---
-        // --- Store (Data Management) ---
+        // --- Almacén (Gestión de Datos) ---
         const Store = {
             state: {
                 user: null, // { name, email, role, id, avatar }
                 products: [],
                 transactions: [],
-                registeredUsers: {} // Using USER_ROLES constant instead
+                registeredUsers: {} // Se usa la constante USER_ROLES en su lugar
             },
 
             init() {
-                // 1. Auth Listener
+                // 1. Escucha de Autenticación
                 onAuthStateChanged(auth, (firebaseUser) => {
                     if (firebaseUser) {
                         const email = firebaseUser.email.toLowerCase();
@@ -512,7 +512,7 @@
                         };
                         console.log('User logged in:', this.state.user);
 
-                        // Start Listeners
+                        // Iniciar Escuchas
                         this.subscribeToData();
 
                         app.navigate('dashboard');
@@ -522,19 +522,19 @@
                         this.state.transactions = [];
                         app.showLogin();
                     }
-                    UI.renderSidebarProfile(); // Update Profile UI
+                    UI.renderSidebarProfile(); // Actualizar UI del Perfil
                 });
             },
 
             subscribeToData() {
-                // Products Listener
+                // Escucha de Productos
                 const qProducts = query(collection(db, "products"), orderBy("name"));
                 onSnapshot(qProducts, (snapshot) => {
                     this.state.products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    UI.render(); // Real-time update
+                    UI.render(); // Actualización en tiempo real
                 });
 
-                // Transactions Listener
+                // Escucha de Transacciones
                 const qTrans = query(collection(db, "transactions"), orderBy("date", "desc"));
                 onSnapshot(qTrans, (snapshot) => {
                     this.state.transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), date: doc.data().date?.toDate() || new Date() }));
@@ -542,12 +542,12 @@
                 });
             },
 
-            // Auth Methods
+            // Métodos de Autenticación
             async login() {
                 try {
                     const provider = new GoogleAuthProvider();
                     await signInWithPopup(auth, provider);
-                    // navigate handled by onAuthStateChanged
+                    // La navegación es manejada por onAuthStateChanged
                     return true;
                 } catch (error) {
                     console.error(error);
@@ -572,10 +572,10 @@
                 return this.state.products.filter(p => p.owner === this.state.user.id);
             },
 
-            // CRUD Operations
+            // Operaciones CRUD
             async addProduct(product) {
-                // owner/ownerName attached before calling this or inside?
-                // Ensure owner is set
+                // ¿Se adjunta owner/ownerName antes de llamar a esto o dentro?
+                // Asegurar que el propietario esté configurado
                 product.owner = product.owner || (this.state.user ? this.state.user.id : 'unknown');
                 product.ownerName = product.ownerName || (this.state.user ? this.state.user.name : 'Unknown');
 
@@ -590,7 +590,7 @@
 
             async updateProduct(product) {
                 try {
-                    const docRef = doc(db, "products", String(product.id)); // Firestore IDs are strings
+                    const docRef = doc(db, "products", String(product.id)); // Los IDs de Firestore son cadenas
                     await updateDoc(docRef, product);
                 } catch (e) {
                     console.error("Error updating: ", e);
@@ -657,7 +657,16 @@
                 const lowStock = visibleProducts.filter(p => p.stock < 5).length;
                 const stagnantProducts = this.getStagnantProducts().length;
 
-                return { totalStock, totalProducts: visibleProducts.length, totalValue, lowStock, stagnantProducts };
+                // Ganancias Mensuales
+                const now = new Date();
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                const monthlyEarnings = this.state.transactions
+                    .filter(t => t.type === 'Venta' &&
+                        t.date >= startOfMonth &&
+                        (this.state.user.role === 'admin' || t.authorId === this.state.user.id))
+                    .reduce((sum, t) => sum + (t.value || t.total || 0), 0);
+
+                return { totalStock, totalProducts: visibleProducts.length, totalValue, lowStock, stagnantProducts, monthlyEarnings };
             },
 
             getStagnantProducts() {
@@ -677,20 +686,20 @@
         };
 
 
-        // --- UI (Rendering) ---
+        // --- Interfaz de Usuario (Renderizado) ---
         const UI = {
             currentView: 'dashboard',
 
             init() {
                 this.render();
-                this.populateCategories(); // Ensure filter is populated on load
+                this.populateCategories(); // Asegurar que el filtro esté cargado al iniciar
             },
 
-            // --- Navigation ---
+            // --- Navegación ---
             navigate(view) {
                 this.currentView = view;
                 this.render();
-                // Close sidebar on mobile if open
+                // Cerrar la barra lateral en móvil si está abierta
                 if (window.innerWidth < 768) {
                     const sidebar = document.getElementById('sidebar');
                     if (sidebar && !sidebar.classList.contains('hidden')) {
@@ -703,7 +712,7 @@
                 Store.logout();
             },
 
-            // --- Modals ---
+            // --- Modales ---
             openAddModal() {
                 document.getElementById('productForm').reset();
                 document.getElementById('productId').value = '';
@@ -712,7 +721,7 @@
                 document.getElementById('productBrand').innerHTML = '<option value="">Seleccionar Categoría primero</option>';
                 document.getElementById('sizeContainer').classList.add('hidden');
 
-                // Owner Assignment for Admin
+                // Asignación de Propietario para Admin
                 const ownerContainer = document.getElementById('ownerAssignmentContainer');
                 const ownerSelect = document.getElementById('productOwnerSelect');
 
@@ -720,7 +729,7 @@
                     ownerContainer.classList.remove('hidden');
                     ownerSelect.innerHTML = '<option value="">Seleccionar Local...</option>';
 
-                    // Hardcoded options as requested
+                    // Opciones predefinidas según lo solicitado
                     const options = [
                         { id: 'emp1', name: 'Local De Ropa' },
                         { id: 'emp2', name: 'Local De Celulares' }
@@ -744,15 +753,15 @@
                 document.getElementById('productModal').classList.add('hidden');
             },
 
-            // --- Form Handling ---
+            // --- Manejo de Formularios ---
             populateCategories() {
-                // Modal Select
+                // Selector del Modal
                 const catSelect = document.getElementById('productCategory');
-                // Filter Select
+                // Selector del Filtro
                 const filterSelect = document.getElementById('filterCategorySelect');
 
                 const populate = (select, includeAllOption) => {
-                    if (select.options.length > (includeAllOption ? 1 : 1)) return; // Already populated check
+                    if (select.options.length > (includeAllOption ? 1 : 1)) return; // Verificación de si ya está cargado
 
                     CATEGORIES.forEach(cat => {
                         const option = document.createElement('option');
@@ -783,7 +792,7 @@
                     brandSelect.appendChild(option);
                 });
 
-                // 2. Handle Size Field
+                // 2. Manejar Campo de Talla
                 if (CLOTHING_CATEGORIES.includes(category)) {
                     sizeContainer.classList.remove('hidden');
                     if (category === 'Tenis') {
@@ -813,7 +822,7 @@
                 const price = parseFloat(document.getElementById('productPrice').value);
                 const stock = parseInt(document.getElementById('productStock').value);
 
-                // Size Logic
+                // Lógica de Tallas
                 let size = null;
                 if (!document.getElementById('sizeContainer').classList.contains('hidden')) {
                     if (category === 'Tenis') {
@@ -823,7 +832,7 @@
                     }
                 }
 
-                // Owner Logic
+                // Lógica de Propietario
                 let owner = null;
                 let ownerName = null;
 
@@ -838,7 +847,7 @@
                         return;
                     }
                 } else {
-                    // Employee: asigna a sí mismo
+                    // Empleado: se asigna a sí mismo
                     owner = Store.state.user.id;
                     ownerName = Store.state.user.name;
                 }
@@ -910,7 +919,7 @@
 
             hideLogin() {
                 document.getElementById('loginView').classList.add('hidden');
-                // Restore Sidebar: Hidden on mobile, Flex on desktop
+                // Restaurar Barra Lateral: Oculta en móvil, Flex en escritorio
                 const sidebar = document.getElementById('sidebar');
                 sidebar.classList.add('hidden');
                 sidebar.classList.add('md:flex');
@@ -922,17 +931,17 @@
                 const user = Store.state.user;
                 const container = document.getElementById('userProfileContainer');
 
-                // Toggle Admin Links
+                // Alternar Enlaces de Admin
                 const adminLinks = document.getElementById('adminLinks');
                 const sidebarBtn = document.getElementById('sidebarNewProdBtn');
 
                 if (user) {
                     if (user.role === 'admin') {
                         if (adminLinks) adminLinks.classList.remove('hidden');
-                        if (sidebarBtn) sidebarBtn.classList.add('hidden'); // Hide New Btn
+                        if (sidebarBtn) sidebarBtn.classList.add('hidden'); // Ocultar Botón Nuevo
                     } else {
                         if (adminLinks) adminLinks.classList.add('hidden');
-                        if (sidebarBtn) sidebarBtn.classList.remove('hidden'); // Show New Btn
+                        if (sidebarBtn) sidebarBtn.classList.remove('hidden'); // Mostrar Botón Nuevo
                     }
                 }
 
@@ -971,9 +980,15 @@
                                 <h2 class="text-2xl font-bold text-white">Dashboard</h2>
                                 <p class="text-gray-400 text-sm">Resumen general de tu negocio</p>
                             </div>
-                            <div class="text-right">
-                                <p class="text-sm text-gray-400">Valor Total Inventario</p>
-                                <p class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500">$${stats.totalValue.toLocaleString()}</p>
+                            <div class="flex gap-8 text-right">
+                                <div>
+                                    <p class="text-[10px] uppercase tracking-wider text-gray-400 mb-1 font-semibold">Ganancias del Mes</p>
+                                    <p class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">$${stats.monthlyEarnings.toLocaleString()}</p>
+                                </div>
+                                <div class="border-l border-white/10 pl-8">
+                                    <p class="text-[10px] uppercase tracking-wider text-gray-400 mb-1 font-semibold">Valor Total Inventario</p>
+                                    <p class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500">$${stats.totalValue.toLocaleString()}</p>
+                                </div>
                             </div>
                         </div>
 
@@ -1022,7 +1037,7 @@
                             </div>
                         </div>
 
-                        <!-- Charts Section -->
+                        <!-- Sección de Gráficos -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div class="glass p-6 rounded-2xl">
                                 <h3 class="text-lg font-semibold text-white mb-6">Progreso de Ventas (% Stock Vendido)</h3>
@@ -1077,7 +1092,7 @@
                                 <div class="w-full md:w-48">
                                      <select id="filterCategorySelect" onchange="UI.handleFilterCategoryChange()" class="w-full px-4 py-2.5 rounded-lg glass-input focus:ring-2 focus:ring-blue-500/50 transition-all [&>option]:bg-slate-800">
                                         <option value="">Todas las Categorías</option>
-                                        <!-- Populated via JS -->
+                                        <!-- Autocompletado vía JS -->
                                      </select>
                                 </div>
                                 <div class="w-full md:w-48">
@@ -1201,7 +1216,7 @@
                 const category = document.getElementById('filterCategorySelect').value;
                 const brandSelect = document.getElementById('filterBrandSelect');
 
-                // Clear brands
+                // Limpiar marcas
                 brandSelect.innerHTML = '<option value="">Todas las Marcas</option>';
 
                 if (category && BRANDS_BY_CATEGORY[category]) {
@@ -1213,8 +1228,8 @@
                         brandSelect.appendChild(option);
                     });
                 } else {
-                    // If no category selected, maybe show all unique brands? Or check if category is empty
-                    // For now, let's collect ALL unique brands from the config if no category is picked
+                    // Si no hay categoría seleccionada, ¿mostrar todas las marcas únicas? O verificar si la categoría está vacía
+                    // Por ahora, recolectemos TODAS las marcas únicas de la configuración si no se selecciona ninguna categoría
                     if (!category) {
                         const allBrands = new Set();
                         Object.values(BRANDS_BY_CATEGORY).forEach(brands => brands.forEach(b => allBrands.add(b)));
@@ -1301,7 +1316,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="stagnantTableBody" class="divide-y divide-white/5 text-sm">
-                                        <!-- Rows injected here -->
+                                        <!-- Las filas se inyectan aquí -->
                                     </tbody>
                                 </table>
                             </div>
@@ -1414,17 +1429,11 @@
                     categoryStats[p.category].current += parseInt(p.stock);
                 });
 
-                // 2. Calculate Sold Stock from Transactions
-                // We attempt to match transactions to visible products
+                // 2. Calcular Stock Vendido desde Transacciones
+                // Intentamos emparejar las transacciones con los productos visibles
                 const userRole = Store.state.user.role;
                 Store.state.transactions.forEach(t => {
                     if (t.type === 'Venta') {
-                        // Find which product this transaction belongs to. 
-                        // Currently transactions only have 'description'. 
-                        // Heuristic: Check if description contains product name AND check ownership if possible.
-                        // Since we don't track ID in transaction, we rely on name.
-                        // For private inventory: Only count if the product exists in visibleProducts
-
                         const product = visibleProducts.find(p => t.description.includes(p.name));
                         if (product) {
                             if (!categoryStats[product.category]) categoryStats[product.category] = { current: 0, sold: 0 };
@@ -1433,7 +1442,7 @@
                     }
                 });
 
-                // 3. Prepare Data for Chart
+                // 3. Preparar Datos para el Gráfico
                 const categories = Object.keys(categoryStats);
                 const percentages = categories.map(cat => {
                     const stats = categoryStats[cat];
@@ -1457,7 +1466,7 @@
                         bar: {
                             borderRadius: 4,
                             horizontal: true,
-                            distributed: true // colorful bars
+                            distributed: true // barras coloridas
                         }
                     },
                     dataLabels: {
@@ -1493,7 +1502,7 @@
                     }
                 };
 
-                // Clear previous chart if exists (not strictly needed as we re-render container, but good practice)
+                // Limpiar gráfico anterior si existe (no es estrictamente necesario ya que refrescamos el contenedor, pero es buena práctica)
                 const chartEl = document.querySelector("#chart-categories");
                 chartEl.innerHTML = '';
                 const chart = new ApexCharts(chartEl, options);
@@ -1501,7 +1510,7 @@
             }
         };
 
-        // --- App Controller ---
+        // --- Controlador de la Aplicación ---
         const app = {
             init() {
                 Store.init();
@@ -1535,7 +1544,7 @@
                 const sizeSelect = document.getElementById('productSizeSelect');
                 const sizeInput = document.getElementById('productSizeInput');
 
-                // Update Brands
+                // Actualizar Marcas
                 brandSelect.innerHTML = '<option value="">Seleccionar...</option>';
                 if (category && BRANDS_BY_CATEGORY[category]) {
                     BRANDS_BY_CATEGORY[category].forEach(brand => {
@@ -1555,15 +1564,15 @@
                     brandSelect.appendChild(option2);
                 }
 
-                // Toggle Size
+                // Alternar Talla
                 if (CLOTHING_CATEGORIES.includes(category)) {
                     sizeContainer.classList.remove('hidden');
                     if (category === 'Tenis') {
-                        // Show Input, Hide Select
+                        // Mostrar Entrada, Ocultar Selector
                         sizeInput.classList.remove('hidden');
                         sizeSelect.classList.add('hidden');
                     } else {
-                        // Show Select, Hide Input
+                        // Mostrar Selector, Ocultar Entrada
                         sizeInput.classList.add('hidden');
                         sizeSelect.classList.remove('hidden');
                     }
@@ -1582,7 +1591,7 @@
                 document.getElementById('productId').value = '';
                 document.getElementById('modalTitle').innerText = 'Nuevo Producto';
 
-                // Admin Assignment Logic
+                // Lógica de Asignación de Admin
                 const ownerContainer = document.getElementById('ownerAssignmentContainer');
                 const ownerSelect = document.getElementById('productOwnerSelect');
 
@@ -1590,12 +1599,12 @@
                     ownerContainer.classList.remove('hidden');
                     ownerSelect.innerHTML = '<option value="">Seleccionar Local...</option>';
 
-                    // Add options: ONLY Locals
+                    // Agregar opciones: SOLO Locales
                     const users = Store.state.registeredUsers;
                     Object.keys(users).forEach(key => {
                         if (users[key].role !== 'admin') {
                             const option = document.createElement('option');
-                            option.value = key; // emp1 or emp2
+                            option.value = key; // emp1 o emp2
                             option.textContent = users[key].name; // 'Local De Ropa', etc.
                             ownerSelect.appendChild(option);
                         }
@@ -1617,7 +1626,7 @@
 
             saveProduct() {
                 const id = document.getElementById('productId').value;
-                // Determine Size value based on active input
+                // Determinar el valor de la Talla basado en el input activo
                 let sizeValue = null;
                 const sizeContainer = document.getElementById('sizeContainer');
                 if (!sizeContainer.classList.contains('hidden')) {
@@ -1638,7 +1647,7 @@
                     size: sizeValue,
                 };
 
-                // Admin Override with Validation
+                // Anulación de Admin con Validación
                 const ownerContainer = document.getElementById('ownerAssignmentContainer');
                 if (Store.state.user.role === 'admin' && !ownerContainer.classList.contains('hidden')) {
                     const selectedOwnerId = document.getElementById('productOwnerSelect').value;
@@ -1696,7 +1705,7 @@
                 }
 
                 this.closeModal();
-                UI.render(); // Refresh view
+                UI.render(); // Refrescar vista
             },
 
             editProduct(id) {
@@ -1706,9 +1715,9 @@
                 document.getElementById('productId').value = product.id;
                 document.getElementById('productName').value = product.name;
 
-                this.populateCategories(); // Ensure options exist
+                this.populateCategories(); // Asegurar que las opciones existan
                 document.getElementById('productCategory').value = product.category;
-                this.handleCategoryChange(); // Populate brands and toggle size
+                this.handleCategoryChange(); // Cargar marcas y alternar talla
 
                 document.getElementById('productBrand').value = product.brand;
 
@@ -1872,7 +1881,7 @@
             },
 
             renderEmployees(container) {
-                // Ensure only admin accesses this
+                // Asegurar que solo el admin acceda a esto
                 if (Store.state.user.role !== 'admin') {
                     app.navigate('dashboard');
                     return;
@@ -1966,7 +1975,7 @@
             },
 
             async login() {
-                // Show loading
+                // Mostrar cargando
                 const loadingToast = Swal.mixin({
                     toast: true,
                     position: 'top-end',
@@ -1985,19 +1994,19 @@
             },
 
             showLogin() {
-                // Show login view and hide main layout
+                // Mostrar vista de login y ocultar layout principal
                 document.getElementById('loginView').classList.remove('hidden');
                 document.getElementById('mainLayout').classList.add('hidden');
                 document.getElementById('sidebar').classList.add('hidden');
             }
         };
 
-        // Expose to window for HTML handlers
+        // Exponer a window para manejadores HTML
         window.UI = UI;
-        window.app = app; // Alias app to the controller for HTML handlers
+        window.app = app; // Alias app para el controlador en manejadores HTML
         window.Store = Store;
 
-        // Start App
+        // Iniciar Aplicación
         document.addEventListener('DOMContentLoaded', () => {
             app.init();
         });
