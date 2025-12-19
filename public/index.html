@@ -501,7 +501,10 @@
                 // 1. Auth Listener
                 onAuthStateChanged(auth, (firebaseUser) => {
                     if (firebaseUser) {
-                        const roleData = USER_ROLES[firebaseUser.email] || { role: 'employee', name: 'Sin Nombre', id: 'unknown' };
+                        const email = firebaseUser.email.toLowerCase();
+                        const roleData = Object.entries(USER_ROLES).find(([key]) => key.toLowerCase() === email)?.[1] ||
+                            { role: 'employee', name: 'Empleado de Local', id: 'unknown' };
+
                         this.state.user = {
                             email: firebaseUser.email,
                             ...roleData,
