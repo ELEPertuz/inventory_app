@@ -615,23 +615,24 @@
                 }
             },
 
-            async sellProduct(id, amount) {
+            async sellProduct(id, amount, customPrice = null) {
                 const product = this.state.products.find(p => String(p.id) === String(id));
                 if (product && product.stock >= amount) {
                     const newStock = product.stock - amount;
+                    const finalPrice = customPrice !== null ? parseFloat(customPrice) : (product.price * amount);
                     await this.updateProduct({ ...product, stock: newStock });
-                    this.logTransaction('Venta', `Venta: ${product.name}`, amount, product.price * amount);
+                    this.logTransaction('Venta', `Venta: ${product.name}`, amount, finalPrice);
                     return true;
                 }
                 return false;
             },
 
-            async adjustStock(id, amount, action) {
+            async adjustStock(id, amount, action, customPrice = null) {
                 if (action === 'add') {
                     await this.addStock(id, amount);
                     return true;
                 } else if (action === 'sell') {
-                    return await this.sellProduct(id, amount);
+                    return await this.sellProduct(id, amount, customPrice);
                 }
                 return false;
             },
@@ -1758,25 +1759,46 @@
 
             async quickAction(id, action) {
                 if (action === 'sell') {
-                    const success = await Store.adjustStock(id, 1, 'sell');
-                    if (success) {
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 2000,
-                            background: '#1e293b',
-                            color: '#fff'
-                        });
-                        Toast.fire({ icon: 'success', title: 'Venta registrada' });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Sin Stock',
-                            text: 'No quedan unidades de este producto',
-                            background: '#1e293b',
-                            color: '#fff'
-                        });
+                    const product = Store.state.products.find(p => String(p.id) === String(id));
+                    const { value: salePrice } = await Swal.fire({
+                        title: 'Valor de Venta',
+                        text: `Ingresa el precio para: ${product ? product.name : 'este producto'}`,
+                        input: 'number',
+                        inputLabel: 'Monto total en $',
+                        inputValue: product ? product.price : '',
+                        showCancelButton: true,
+                        confirmButtonText: 'Registrar Venta',
+                        cancelButtonText: 'Cancelar',
+                        background: '#1e293b',
+                        color: '#fff',
+                        inputValidator: (value) => {
+                            if (!value || value <= 0) {
+                                return 'Debes ingresar un valor válido';
+                            }
+                        }
+                    });
+
+                    if (salePrice) {
+                        const success = await Store.adjustStock(id, 1, 'sell', salePrice);
+                        if (success) {
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                background: '#1e293b',
+                                color: '#fff'
+                            });
+                            Toast.fire({ icon: 'success', title: 'Venta registrada' });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Sin Stock',
+                                text: 'No quedan unidades de este producto',
+                                background: '#1e293b',
+                                color: '#fff'
+                            });
+                        }
                     }
                 } else if (action === 'add') {
                     await Store.adjustStock(id, 1, 'add');
