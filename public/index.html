@@ -1494,15 +1494,22 @@
             },
 
             populateCategories() {
-                const select = document.getElementById('productCategory');
-                if (!select) return;
-                select.innerHTML = '<option value="">Seleccionar...</option>';
-                CATEGORIES.forEach(cat => {
-                    const option = document.createElement('option');
-                    option.value = cat;
-                    option.textContent = cat;
-                    select.appendChild(option);
-                });
+                const catSelect = document.getElementById('productCategory');
+                const filterSelect = document.getElementById('filterCategorySelect');
+
+                const populate = (select, includeAllOption) => {
+                    if (!select) return;
+                    select.innerHTML = includeAllOption ? '<option value="">Todas las Categorías</option>' : '<option value="">Seleccionar...</option>';
+                    CATEGORIES.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat;
+                        option.textContent = cat;
+                        select.appendChild(option);
+                    });
+                };
+
+                populate(catSelect, false);
+                populate(filterSelect, true);
             },
 
             handleCategoryChange() {
@@ -1583,6 +1590,7 @@
 
                 const modal = document.getElementById('productModal');
                 modal.classList.remove('hidden');
+                this.populateCategories();
                 setTimeout(() => modal.querySelector('div.transform').classList.remove('scale-95', 'opacity-0'), 10);
             },
 
@@ -1954,7 +1962,7 @@
 
         // Start App
         document.addEventListener('DOMContentLoaded', () => {
-            Store.init();
+            app.init();
         });
     </script>
 
