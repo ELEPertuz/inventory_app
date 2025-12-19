@@ -678,6 +678,10 @@
                 }
             },
 
+            logout() {
+                Store.logout();
+            },
+
             // --- Modals ---
             openAddModal() {
                 document.getElementById('productForm').reset();
@@ -1924,22 +1928,7 @@
             },
 
             logout() {
-                Swal.fire({
-                    title: '¿Cerrar Sesión?',
-                    text: 'Tendrás que iniciar sesión nuevamente para acceder.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3b82f6',
-                    cancelButtonColor: '#334155',
-                    confirmButtonText: 'Sí, salir',
-                    cancelButtonText: 'Cancelar',
-                    background: '#1e293b',
-                    color: '#fff'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Store.logout();
-                    }
-                });
+                Store.logout();
             },
 
             showLogin() {
