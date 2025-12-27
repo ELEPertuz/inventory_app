@@ -558,22 +558,10 @@
                 // Escucha de Productos (Con Paginación)
                 this.subscribeToProducts();
 
-                // Escucha de Transacciones (Limitado a las últimas 50 para ahorrar cuota)
-                const qTrans = query(collection(db, "transactions"), orderBy("date", "desc"), limit(50));
+                // Escucha de Transacciones (Historial completo para cálculo local)
+                const qTrans = query(collection(db, "transactions"), orderBy("date", "desc"));
                 onSnapshot(qTrans, (snapshot) => {
                     this.state.transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), date: doc.data().date?.toDate() || new Date() }));
-                    UI.render();
-                });
-
-                // Escucha de Estadísticas Mensuales (Agregación)
-                const now = new Date();
-                const currentMonthId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-                onSnapshot(doc(db, "monthly_stats", currentMonthId), (doc) => {
-                    if (doc.exists()) {
-                        this.state.monthlyStats = doc.data().total || 0;
-                    } else {
-                        this.state.monthlyStats = 0;
-                    }
                     UI.render();
                 });
             },
@@ -820,10 +808,13 @@
                 const lowStock = visibleProducts.filter(p => p.stock < 5).length;
                 const stagnantProducts = this.getStagnantProducts().length;
 
-                // Ganancias Mensuales (Usando Agregación para Ahorrar Lecturas)
-                // Si monthlyStats es 0 (ej. inicio de mes o sin datos migrados), podríamos mostrar 0 o intentar calcular
-                // de lo que hay en memoria, pero para consistencia usamos el dato agregado.
-                const monthlyEarnings = this.state.monthlyStats;
+                // Ganancias Mensuales (Cálculo en memoria)
+                const now = new Date();
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+                const monthlyEarnings = this.state.transactions
+                    .filter(t => t.type === 'Venta' && t.date >= startOfMonth && (this.state.user.role === 'admin' || t.authorId === this.state.user.id))
+                    .reduce((sum, t) => sum + (parseFloat(t.value) || 0), 0);
 
                 return { totalStock, totalProducts: visibleProducts.length, totalValue, lowStock, stagnantProducts, monthlyEarnings };
             },
