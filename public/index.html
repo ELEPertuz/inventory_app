@@ -883,14 +883,30 @@
                 threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21);
 
                 return visibleProducts.filter(p => {
-                    // Si el producto fue creado hace menos de 3 semanas, NO puede estar estancado
+                    // 1. Si tiene fecha de creación y es reciente (< 3 sem), NO está estancado
                     if (p.createdAt && p.createdAt > threeWeeksAgo) return false;
 
                     const sales = this.state.transactions
                         .filter(t => t.type === 'Venta' && t.description.includes(p.name) && (this.state.user.role === 'admin' || t.authorId === this.state.user.id))
                         .sort((a, b) => b.date - a.date);
 
-                    if (sales.length === 0) return true;
+                    if (sales.length === 0) {
+                        // 2. Si NO tiene ventas, verificamos si es una "Entrada" reciente (nuevo producto)
+                        // Esto ayuda con productos que no tienen el campo 'createdAt' (migración)
+                        const arrival = this.state.transactions.find(t =>
+                            (t.type === 'Entrada' || t.description.toLowerCase().includes('creado')) &&
+                            t.description.includes(p.name) &&
+                            t.date > threeWeeksAgo
+                        );
+
+                        if (arrival) return false; // Es nuevo, aún no debe marcarse
+
+                        // 3. Si no tiene ventas Y no hay registro de entrada reciente, 
+                        // y no tiene createdAt (o es viejo), entonces sí está estancado.
+                        return true;
+                    }
+
+                    // 4. Si tiene ventas, comparamos con la última
                     return sales[0].date < threeWeeksAgo;
                 });
             }
