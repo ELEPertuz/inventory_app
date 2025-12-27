@@ -1066,6 +1066,90 @@
                 else if (this.currentView === 'earningsHistory') this.renderEarningsHistory(container);
 
                 this.updateActiveLink();
+
+                // Render Notification Bell (Solo Admin)
+                if (Store.state.user.role === 'admin') {
+                    this.renderNotificationBell();
+                } else {
+                    // Remove if exists
+                    const bell = document.getElementById('adminNotificationBell');
+                    if (bell) bell.remove();
+                }
+            },
+
+            renderNotificationBell() {
+                let bellContainer = document.getElementById('adminNotificationBell');
+                if (!bellContainer) {
+                    bellContainer = document.createElement('div');
+                    bellContainer.id = 'adminNotificationBell';
+                    bellContainer.className = 'fixed top-6 right-6 z-50';
+                    document.body.appendChild(bellContainer);
+                }
+
+                const lowStockProducts = Store.getStats().lowStockProducts || [];
+                const hasNotifications = lowStockProducts.length > 0;
+
+                bellContainer.innerHTML = `
+                    <div class="relative">
+                        <button onclick="document.getElementById('notificationDropdown').classList.toggle('hidden')" 
+                            class="p-3 bg-slate-800/90 backdrop-blur border border-white/10 rounded-full text-gray-400 hover:text-white hover:bg-white/10 shadow-lg transition-all transform hover:scale-105">
+                            <i class="fas fa-bell text-xl"></i>
+                            ${hasNotifications ? `
+                            <span class="absolute -top-1 -right-1 flex h-5 w-5">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-5 w-5 bg-red-500 text-[10px] text-white font-bold items-center justify-center">
+                                    ${lowStockProducts.length}
+                                </span>
+                            </span>` : ''}
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div id="notificationDropdown" class="hidden absolute right-0 mt-3 w-80 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl">
+                            <div class="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
+                                <h3 class="font-bold text-white">Notificaciones</h3>
+                                <span class="text-xs text-gray-400">${lowStockProducts.length} alertas</span>
+                            </div>
+                            <div class="max-h-96 overflow-y-auto custom-scrollbar">
+                                ${hasNotifications ? lowStockProducts.map(p => `
+                                    <div class="p-4 hover:bg-white/5 border-b border-white/5 transition-colors flex gap-4 items-start">
+                                        <div class="p-2 rounded bg-red-500/10 text-red-400 mt-1">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-white">${p.name}</p>
+                                            <p class="text-xs text-gray-400 flex items-center gap-2 mt-1">
+                                                Stock actual: <span class="text-red-400 font-bold">${p.stock}</span>
+                                                <span class="text-slate-600">|</span>
+                                                Min: 5
+                                            </p>
+                                            ${p.ownerName ? `<p class="text-[10px] text-blue-400 mt-1">${p.ownerName}</p>` : ''}
+                                        </div>
+                                    </div>
+                                `).join('') : `
+                                    <div class="p-8 text-center text-gray-500 flex flex-col items-center gap-3">
+                                        <i class="fas fa-check-circle text-2xl text-green-500/50"></i>
+                                        <p class="text-sm">Todo en orden</p>
+                                    </div>
+                                `}
+                            </div>
+                            ${hasNotifications ? `
+                            <div class="p-3 bg-white/5 border-t border-white/5 text-center">
+                                <button onclick="app.navigate('inventory'); document.getElementById('notificationDropdown').classList.add('hidden')" class="text-xs text-blue-400 hover:text-blue-300 font-medium">Ver Inventario Completo</button>
+                            </div>` : ''}
+                        </div>
+                    </div>
+                `;
+
+                // Close on click outside logic (optional but good UX)
+                // For simplicity, relying on toggle button for now or simple logic:
+                window.onclick = function (event) {
+                    if (!event.target.closest('#adminNotificationBell')) {
+                        const dropdown = document.getElementById('notificationDropdown');
+                        if (dropdown && !dropdown.classList.contains('hidden')) {
+                            dropdown.classList.add('hidden');
+                        }
+                    }
+                }
             },
 
             showLogin() {
@@ -1152,6 +1236,24 @@
                         </div>
 
                         <!-- KPI Cards -->
+                if (!container) return; // Safety check
+
+                container.innerHTML = `
+                    < div class="slide-in space-y-8" >
+                        < !--Header -->
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <h2 class="text-3xl font-bold text-white">Panel de Control</h2>
+                                <p class="text-gray-400 mt-1">Resumen de actividad y rendimiento</p>
+                            </div>
+                            <div class="flex items-center gap-3 bg-white/5 p-2 rounded-xl border border-white/5">
+                                <div class="px-4 py-2 rounded-lg bg-blue-500/20 text-blue-400 font-medium text-sm">
+                                    ${new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--KPIs Grid(Adjusted to 3 columns)-- >
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="glass p-6 rounded-2xl relative overflow-hidden group">
                                 <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl group-hover:bg-blue-500/30 transition-all"></div>
@@ -1168,16 +1270,16 @@
                             </div>
 
                             <div class="glass p-6 rounded-2xl relative overflow-hidden group">
-                                <div class="absolute -right-6 -top-6 w-24 h-24 bg-pink-500/20 rounded-full blur-2xl group-hover:bg-pink-500/30 transition-all"></div>
+                                <div class="absolute -right-6 -top-6 w-24 h-24 bg-green-500/20 rounded-full blur-2xl group-hover:bg-green-500/30 transition-all"></div>
                                 <div class="relative">
                                     <div class="flex justify-between items-start mb-4">
-                                        <div class="p-3 rounded-lg bg-pink-500/10 text-pink-400">
-                                            <i class="fas fa-exclamation-triangle text-xl"></i>
+                                        <div class="p-3 rounded-lg bg-green-500/10 text-green-400">
+                                            <i class="fas fa-dollar-sign text-xl"></i>
                                         </div>
-                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/20">Atención</span>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-white/5 text-gray-300">Valor Inventario</span>
                                     </div>
-                                    <h3 class="text-3xl font-bold text-white mb-1">${stats.lowStock}</h3>
-                                    <p class="text-sm text-gray-400">Productos con stock bajo (< 5)</p>
+                                    <h3 class="text-3xl font-bold text-white mb-1">$${stats.totalValue.toLocaleString()}</h3>
+                                    <p class="text-sm text-gray-400">Valor total de productos en stock</p>
                                 </div>
                             </div>
 
@@ -1196,18 +1298,18 @@
                             </div>
                         </div>
 
-                        <!-- Sección de Gráficos -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div class="glass p-6 rounded-2xl">
-                                <h3 class="text-lg font-semibold text-white mb-6">Progreso de Ventas (% Stock Vendido)</h3>
-                                <div id="chart-categories" class="h-64 flex items-center justify-center text-gray-500">Cargando gráfico...</div>
-                            </div>
-                            <div class="glass p-6 rounded-2xl">
-                                <h3 class="text-lg font-semibold text-white mb-6">Últimos Movimientos</h3>
-                                <div class="space-y-4">
-                                    ${Store.state.transactions
-                        .filter(t => Store.state.user.role === 'admin' || t.authorId === Store.state.user.id)
-                        .slice(0, 5).map(t => `
+                        <!--Sección de Gráficos-- >
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="glass p-6 rounded-2xl">
+                            <h3 class="text-lg font-semibold text-white mb-6">Progreso de Ventas (% Stock Vendido)</h3>
+                            <div id="chart-categories" class="h-64 flex items-center justify-center text-gray-500">Cargando gráfico...</div>
+                        </div>
+                        <div class="glass p-6 rounded-2xl">
+                            <h3 class="text-lg font-semibold text-white mb-6">Últimos Movimientos</h3>
+                            <div class="space-y-4">
+                                ${Store.state.transactions
+                                    .filter(t => Store.state.user.role === 'admin' || t.authorId === Store.state.user.id)
+                                    .slice(0, 5).map(t => `
                                         <div class="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-8 h-8 rounded-full flex items-center justify-center ${t.type === 'Venta' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400'}">
@@ -1223,18 +1325,17 @@
                                             </span>
                                         </div>
                                     `).join('') || '<p class="text-gray-500 text-sm text-center py-4">Sin movimientos recientes</p>'}
-                                </div>
                             </div>
                         </div>
                     </div>
-                `;
-                container.innerHTML = html;
+                    </div >
+            `;
                 this.initCharts();
             },
 
             renderInventory(container) {
                 const html = `
-                    <div class="fade-in space-y-6 h-full flex flex-col">
+            < div class="fade-in space-y-6 h-full flex flex-col" >
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
                                 <h2 class="text-2xl font-bold text-white">Inventario</h2>
@@ -1297,8 +1398,8 @@
                                 </button>
                             </div>
                         </div>
-                    </div>
-                `;
+                    </div >
+            `;
                 container.innerHTML = html;
 
                 // Populate initial state
@@ -1311,14 +1412,14 @@
                 if (!tbody) return;
 
                 if (products.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500">No se encontraron productos</td></tr>`;
+                    tbody.innerHTML = `< tr > <td colspan="5" class="p-8 text-center text-gray-500">No se encontraron productos</td></tr > `;
                     return;
                 }
 
                 const isAdmin = Store.state.user && Store.state.user.role === 'admin';
 
                 tbody.innerHTML = products.map(p => `
-                    <tr class="hover:bg-white/5 transition-colors group">
+            < tr class="hover:bg-white/5 transition-colors group" >
                         <td class="p-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-gray-400 border border-white/5 overflow-hidden">
@@ -1348,7 +1449,8 @@
                         <td class="p-4 text-right font-medium text-gray-300">
                             $${Math.floor(parseFloat(p.price)).toLocaleString()}
                         </td>
-                        ${!isAdmin ? `
+                        ${
+            !isAdmin ? `
                         <td class="p-4 text-right">
                             <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button onclick="app.quickAction('${p.id}', 'sell')" class="p-2 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20" title="Vender 1">
@@ -1364,7 +1466,8 @@
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
-                        </td>` : ''}
+                        </td>` : ''
+        }
                     </tr >
             `).join('');
             },
@@ -1473,7 +1576,7 @@
             renderStagnantInventory(container) {
                 const stagnantProducts = Store.getStagnantProducts();
                 const html = `
-                    <div class="fade-in space-y-6 h-full flex flex-col">
+            < div class="fade-in space-y-6 h-full flex flex-col" >
                         <div class="flex items-center gap-4">
                             <button onclick="app.navigate('dashboard')" class="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
                                 <i class="fas fa-arrow-left"></i>
@@ -1502,16 +1605,16 @@
                                 </table>
                             </div>
                         </div>
-                    </div>
-                `;
+                    </div >
+            `;
                 container.innerHTML = html;
 
                 const tbody = document.getElementById('stagnantTableBody');
                 if (stagnantProducts.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500">¡Genial! No tienes productos estancados.</td></tr>`;
+                    tbody.innerHTML = `< tr > <td colspan="5" class="p-8 text-center text-gray-500">¡Genial! No tienes productos estancados.</td></tr > `;
                 } else {
                     tbody.innerHTML = stagnantProducts.map(p => `
-                        <tr class="hover:bg-white/5 transition-colors group">
+            < tr class="hover:bg-white/5 transition-colors group" >
                             <td class="p-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-gray-400 border border-white/5 overflow-hidden">
@@ -1537,7 +1640,7 @@
                                     Sin Movimiento
                                 </span>
                             </td>
-                        </tr>
+                        </tr >
             `).join('');
                 }
             },
@@ -1952,7 +2055,7 @@
                     const product = Store.state.products.find(p => String(p.id) === String(id));
                     const { value: salePrice } = await Swal.fire({
                         title: 'Valor de Venta',
-                        text: `Ingresa el precio para: ${product ? product.name : 'este producto'}`,
+                        text: `Ingresa el precio para: ${ product ? product.name : 'este producto' } `,
                         input: 'number',
                         inputLabel: 'Monto total en $',
                         inputValue: product ? product.price : '',
@@ -2167,7 +2270,7 @@
 
                     transactions.forEach(t => {
                         const date = t.date ? new Date(t.date) : new Date();
-                        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                        const key = `${ date.getFullYear() } -${ String(date.getMonth() + 1).padStart(2, '0') } `;
                         if (!monthlyData[key]) {
                             monthlyData[key] = {
                                 total: 0,
@@ -2189,7 +2292,7 @@
                     const sortedMonths = Object.keys(monthlyData).sort().reverse();
 
                     const html = `
-                    <div class="fade-in space-y-6">
+            < div class="fade-in space-y-6" >
                         <div class="flex items-center gap-4">
                             <button onclick="app.navigate('dashboard')" class="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
                                 <i class="fas fa-arrow-left"></i>
@@ -2260,20 +2363,20 @@
                             </table>
                         </div>
                         </div>
-                    </div>
-                `;
+                    </div >
+            `;
                     container.innerHTML = html;
                 } catch (error) {
                     console.error("Error in renderEarningsHistory:", error);
                     container.innerHTML = `
-                        <div class="flex flex-col items-center justify-center p-20 text-center space-y-4">
+            < div class="flex flex-col items-center justify-center p-20 text-center space-y-4" >
                             <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 text-2xl">
                                 <i class="fas fa-exclamation-triangle"></i>
                             </div>
                             <h3 class="text-xl font-bold text-white">Error al cargar historial</h3>
                             <p class="text-gray-400 max-w-sm">Hubo un problema procesando los datos de ventas. Por favor, intenta recargar la página.</p>
                             <button onclick="location.reload()" class="px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-white/10">Recargar Sistema</button>
-                        </div>
+                        </div >
                     `;
                 }
             },
