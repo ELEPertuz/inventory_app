@@ -546,6 +546,8 @@
                         // Iniciar Escuchas de Datos
                         this.subscribeToData();
 
+
+
                         app.navigate('dashboard');
                     } else {
                         // Limpiar Sesión
@@ -754,14 +756,18 @@
                     this.state.currentTransactionUnsubscribe();
                 }
 
+                // Calcular fecha límite (2 meses atrás)
+                const cutoffDate = new Date();
+                cutoffDate.setMonth(cutoffDate.getMonth() - 2);
+
                 const pageIndex = this.state.transactionsPage - 1;
                 const startCursor = this.state.transactionCursors[pageIndex];
 
                 let qTrans;
                 if (startCursor) {
-                    qTrans = query(collection(db, "transactions"), orderBy("date", "desc"), startAfter(startCursor), limit(this.state.transactionsPerPage));
+                    qTrans = query(collection(db, "transactions"), where("date", ">=", cutoffDate), orderBy("date", "desc"), startAfter(startCursor), limit(this.state.transactionsPerPage));
                 } else {
-                    qTrans = query(collection(db, "transactions"), orderBy("date", "desc"), limit(this.state.transactionsPerPage));
+                    qTrans = query(collection(db, "transactions"), where("date", ">=", cutoffDate), orderBy("date", "desc"), limit(this.state.transactionsPerPage));
                 }
 
                 this.state.currentTransactionUnsubscribe = onSnapshot(qTrans, (snapshot) => {
