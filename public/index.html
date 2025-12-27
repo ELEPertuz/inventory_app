@@ -674,6 +674,7 @@
                 product.ownerName = product.ownerName || (this.state.user ? this.state.user.name : 'Unknown');
 
                 try {
+                    product.createdAt = serverTimestamp();
                     await addDoc(collection(db, "products"), product);
                     this.logTransaction('Entrada', `Producto creado: ${product.name}`, product.stock);
                 } catch (e) {
@@ -738,7 +739,14 @@
                 }
 
                 this.state.currentProductUnsubscribe = onSnapshot(qProducts, (snapshot) => {
-                    this.state.products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    this.state.products = snapshot.docs.map(doc => {
+                        const data = doc.data();
+                        return {
+                            id: doc.id,
+                            ...data,
+                            createdAt: data.createdAt?.toDate() || null
+                        };
+                    });
 
                     // Guardar el último snapshot para la siguiente página
                     // Lo guardamos en el índice Siguiente (pageIndex + 1)
@@ -875,6 +883,9 @@
                 threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21);
 
                 return visibleProducts.filter(p => {
+                    // Si el producto fue creado hace menos de 3 semanas, NO puede estar estancado
+                    if (p.createdAt && p.createdAt > threeWeeksAgo) return false;
+
                     const sales = this.state.transactions
                         .filter(t => t.type === 'Venta' && t.description.includes(p.name) && (this.state.user.role === 'admin' || t.authorId === this.state.user.id))
                         .sort((a, b) => b.date - a.date);
