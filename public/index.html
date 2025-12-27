@@ -856,15 +856,17 @@
                 const visibleProducts = this.getVisibleProducts();
                 const totalStock = visibleProducts.reduce((sum, p) => sum + p.stock, 0);
                 const totalValue = visibleProducts.reduce((sum, p) => sum + (p.stock * p.price), 0);
-                const lowStock = visibleProducts.filter(p => p.stock < 5).length;
-                const stagnantProducts = this.getStagnantProducts().length;
+                const lowStockList = visibleProducts.filter(p => p.stock < 5);
+                const lowStock = lowStockList.length;
+                const stagnantProductsList = this.getStagnantProducts();
+                const stagnantProducts = stagnantProductsList.length;
 
                 // Ganancias Mensuales (Usando Agregación para Ahorrar Lecturas)
                 // Si monthlyStats es 0 (ej. inicio de mes o sin datos migrados), podríamos mostrar 0 o intentar calcular
                 // de lo que hay en memoria, pero para consistencia usamos el dato agregado.
                 const monthlyEarnings = this.state.monthlyStats;
 
-                return { totalStock, totalProducts: visibleProducts.length, totalValue, lowStock, stagnantProducts, monthlyEarnings };
+                return { totalStock, totalProducts: visibleProducts.length, totalValue, lowStock, lowStockProducts: lowStockList, stagnantProducts, stagnantProductsList, monthlyEarnings };
             },
 
             getStagnantProducts() {
@@ -1125,8 +1127,11 @@
                     document.body.appendChild(bellContainer);
                 }
 
-                const lowStockProducts = Store.getStats().lowStockProducts || [];
-                const hasNotifications = lowStockProducts.length > 0;
+                const stats = Store.getStats();
+                const lowStockProducts = stats.lowStockProducts || [];
+                const stagnantProducts = stats.stagnantProductsList || [];
+                const totalNotifications = lowStockProducts.length + stagnantProducts.length;
+                const hasNotifications = totalNotifications > 0;
 
                 bellContainer.innerHTML = `
                     <div class="relative">
@@ -1137,40 +1142,57 @@
                             <span class="absolute -top-1 -right-1 flex h-5 w-5">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-5 w-5 bg-red-500 text-[10px] text-white font-bold items-center justify-center">
-                                    ${lowStockProducts.length}
+                                    ${totalNotifications}
                                 </span>
                             </span>` : ''}
                         </button>
 
                         <!-- Dropdown -->
-                        <div id="notificationDropdown" class="hidden absolute right-0 mt-3 w-80 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl">
+                            <div id="notificationDropdown" class="hidden absolute right-0 mt-3 w-80 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl max-h-[80vh] flex flex-col">
                             <div class="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
                                 <h3 class="font-bold text-white">Notificaciones</h3>
-                                <span class="text-xs text-gray-400">${lowStockProducts.length} alertas</span>
+                                <span class="text-xs text-gray-400">${totalNotifications} alertas</span>
                             </div>
-                            <div class="max-h-96 overflow-y-auto custom-scrollbar">
-                                ${hasNotifications ? lowStockProducts.map(p => `
-                                    <div class="p-4 hover:bg-white/5 border-b border-white/5 transition-colors flex gap-4 items-start">
-                                        <div class="p-2 rounded bg-red-500/10 text-red-400 mt-1">
-                                            <i class="fas fa-exclamation-triangle"></i>
+                            
+                            <div class="overflow-y-auto flex-1 custom-scrollbar p-2 space-y-2">
+                                ${lowStockProducts.length > 0 ? `
+                                    <div class="px-2 py-1 text-xs font-semibold text-gray-500 uppercase">Stock Bajo</div>
+                                    ${lowStockProducts.map(p => `
+                                        <div class="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer" onclick="app.navigate('inventory'); document.getElementById('searchInput').value='${p.name}'; UI.filterInventory();">
+                                            <div class="w-10 h-10 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-medium text-white truncate">${p.name}</p>
+                                                <p class="text-xs text-red-400">${p.stock} unidades restantes</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p class="text-sm font-medium text-white">${p.name}</p>
-                                            <p class="text-xs text-gray-400 flex items-center gap-2 mt-1">
-                                                Stock actual: <span class="text-red-400 font-bold">${p.stock}</span>
-                                                <span class="text-slate-600">|</span>
-                                                Min: 5
-                                            </p>
-                                            ${p.ownerName ? `<p class="text-[10px] text-blue-400 mt-1">${p.ownerName}</p>` : ''}
+                                    `).join('')}
+                                ` : ''}
+
+                                ${stagnantProducts.length > 0 ? `
+                                    <div class="px-2 py-1 text-xs font-semibold text-gray-500 uppercase mt-2">Inventario Estancado (> 3 sem)</div>
+                                    ${stagnantProducts.map(p => `
+                                        <div class="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer" onclick="app.navigate('stagnant')">
+                                            <div class="w-10 h-10 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center flex-shrink-0">
+                                                <i class="fas fa-clock"></i>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-medium text-white truncate">${p.name}</p>
+                                                <p class="text-xs text-orange-400">Sin ventas recientes</p>
+                                            </div>
                                         </div>
+                                    `).join('')}
+                                ` : ''}
+
+                                ${!hasNotifications ? `
+                                    <div class="p-8 text-center text-gray-500">
+                                        <i class="fas fa-check-circle text-3xl mb-2 opacity-50"></i>
+                                        <p>Todo está en orden</p>
                                     </div>
-                                `).join('') : `
-                                    <div class="p-8 text-center text-gray-500 flex flex-col items-center gap-3">
-                                        <i class="fas fa-check-circle text-2xl text-green-500/50"></i>
-                                        <p class="text-sm">Todo en orden</p>
-                                    </div>
-                                `}
+                                ` : ''}
                             </div>
+
                             ${hasNotifications ? `
                             <div class="p-3 bg-white/5 border-t border-white/5 text-center">
                                 <button onclick="app.navigate('inventory'); document.getElementById('notificationDropdown').classList.add('hidden')" class="text-xs text-blue-400 hover:text-blue-300 font-medium">Ver Inventario Completo</button>
