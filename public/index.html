@@ -425,7 +425,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp, enableIndexedDbPersistence, limit, increment, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp, enableIndexedDbPersistence, limit, increment, getDoc, setDoc, startAfter } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // --- Configuración de Firebase ---
         const firebaseConfig = {
@@ -509,6 +509,14 @@
                 products: [],
                 transactions: [],
                 monthlyStats: 0,
+                // Pagination State
+                productsPage: 1,
+                productsPerPage: 50,
+                productCursors: [null],
+                currentProductUnsubscribe: null,
+                // Session Enforcement
+                currentSessionId: null,
+                sessionUnsubscribe: null,
                 registeredUsers: {} // Se usa la constante USER_ROLES en su lugar
             },
 
@@ -527,11 +535,16 @@
                         };
                         console.log('User logged in:', this.state.user);
 
-                        // Iniciar Escuchas
+                        // Iniciar Gestión de Sesión Única
+                        this.initSession(this.state.user.id);
+
+                        // Iniciar Escuchas de Datos
                         this.subscribeToData();
 
                         app.navigate('dashboard');
                     } else {
+                        // Limpiar Sesión
+                        if (this.state.sessionUnsubscribe) this.state.sessionUnsubscribe();
                         this.state.user = null;
                         this.state.products = [];
                         this.state.transactions = [];
@@ -542,12 +555,8 @@
             },
 
             subscribeToData() {
-                // Escucha de Productos
-                const qProducts = query(collection(db, "products"), orderBy("name"));
-                onSnapshot(qProducts, (snapshot) => {
-                    this.state.products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    UI.render(); // Actualización en tiempo real
-                });
+                // Escucha de Productos (Con Paginación)
+                this.subscribeToProducts();
 
                 // Escucha de Transacciones (Limitado a las últimas 50 para ahorrar cuota)
                 const qTrans = query(collection(db, "transactions"), orderBy("date", "desc"), limit(50));
@@ -569,6 +578,51 @@
                 });
             },
 
+            async initSession(userId) {
+                // 1. Obtener o Generar ID de Sesión
+                let sessionId = sessionStorage.getItem('app_session_id');
+                if (!sessionId) {
+                    sessionId = Date.now().toString() + '-' + Math.random().toString(36).substr(2, 9);
+                    sessionStorage.setItem('app_session_id', sessionId);
+                }
+                this.state.currentSessionId = sessionId;
+
+                // 2. Registrar en Firestore
+                const sessionRef = doc(db, "active_sessions", userId);
+                try {
+                    await setDoc(sessionRef, {
+                        sessionId: sessionId,
+                        lastLogin: serverTimestamp(),
+                        deviceInfo: navigator.userAgent
+                    });
+                } catch (e) {
+                    console.error("Error registrando sesión:", e);
+                }
+
+                // 3. Escuchar Conflictos
+                if (this.state.sessionUnsubscribe) this.state.sessionUnsubscribe();
+
+                this.state.sessionUnsubscribe = onSnapshot(sessionRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.data();
+                        // Si el ID en la nube es diferente al nuestro, alguien más entró
+                        if (data.sessionId && data.sessionId !== this.state.currentSessionId) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Sesión Cerrada',
+                                text: 'Se ha abierto una sesión en otro dispositivo o pestaña.',
+                                confirmButtonText: 'Entendido',
+                                allowOutsideClick: false,
+                                background: '#1e293b',
+                                color: '#fff'
+                            }).then(() => {
+                                this.logout(true); // Logout forzado
+                            });
+                        }
+                    }
+                });
+            },
+
             // Métodos de Autenticación
             async login() {
                 try {
@@ -583,12 +637,22 @@
                 }
             },
 
-            async logout() {
+            async logout(forced = false) {
                 try {
+                    if (this.state.sessionUnsubscribe) this.state.sessionUnsubscribe();
+
+                    // Solo limpiamos active_sessions si el usuario se va voluntariamente
+                    // Si es forzado, NO borramos porque eso mataría la sesión válida del otro dispositivo
+                    if (!forced && this.state.user) {
+                        // Opcional: borrar el doc para limpieza, aunque no es estricto
+                        // await deleteDoc(doc(db, "active_sessions", this.state.user.id));
+                    }
+
                     await signOut(auth);
                 } catch (e) {
                     console.error("Logout error:", e);
                 } finally {
+                    sessionStorage.removeItem('app_session_id'); // Limpiar ID local para generar uno nuevo la próxima
                     window.location.reload();
                 }
             },
@@ -654,6 +718,53 @@
                 return false;
             },
 
+            subscribeToProducts() {
+                // Cancelar suscripción anterior si existe
+                if (this.state.currentProductUnsubscribe) {
+                    this.state.currentProductUnsubscribe();
+                }
+
+                const pageIndex = this.state.productsPage - 1;
+                const startCursor = this.state.productCursors[pageIndex];
+
+                let qProducts;
+                if (startCursor) {
+                    qProducts = query(collection(db, "products"), orderBy("name"), startAfter(startCursor), limit(this.state.productsPerPage));
+                } else {
+                    qProducts = query(collection(db, "products"), orderBy("name"), limit(this.state.productsPerPage));
+                }
+
+                this.state.currentProductUnsubscribe = onSnapshot(qProducts, (snapshot) => {
+                    this.state.products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                    // Guardar el último snapshot para la siguiente página
+                    // Lo guardamos en el índice Siguiente (pageIndex + 1)
+                    if (snapshot.docs.length > 0) {
+                        const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+                        this.state.productCursors[pageIndex + 1] = lastDoc;
+                    }
+
+                    UI.render();
+                });
+            },
+
+            nextPage() {
+                // Solo avanzar si tenemos un cursor para la siguiente página
+                // o si la página actual está llena (indicando que PODRÍA haber más)
+                // Usamos el cursor guardado en subscribeToProducts
+                if (this.state.products.length === this.state.productsPerPage) {
+                    this.state.productsPage++;
+                    this.subscribeToProducts();
+                }
+            },
+
+            prevPage() {
+                if (this.state.productsPage > 1) {
+                    this.state.productsPage--;
+                    this.subscribeToProducts();
+                }
+            },
+
             async adjustStock(id, amount, action, customPrice = null) {
                 if (action === 'add') {
                     await this.addStock(id, amount);
@@ -697,7 +808,6 @@
                         this.state.transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), date: doc.data().date?.toDate() || new Date() }));
                         UI.render();
                     });
-                    // Notificar que se cargó todo (opcional, por ahora el botón desaparecerá por lógica de UI)
                 } catch (e) {
                     console.error("Error loading all transactions:", e);
                 }
@@ -1170,6 +1280,21 @@
                                         <!-- Rows injected here -->
                                     </tbody>
                                 </table>
+                            </div>
+                            
+                            <!-- Controles de Paginación -->
+                            <div class="p-4 border-t border-white/5 bg-white/5 flex justify-between items-center">
+                                <button onclick="Store.prevPage()" ${Store.state.productsPage === 1 ? 'disabled' : ''} class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-all flex items-center gap-2">
+                                    <i class="fas fa-chevron-left"></i> Anterior
+                                </button>
+                                
+                                <span class="text-sm font-medium text-gray-400">
+                                    Página <span class="text-white font-bold">${Store.state.productsPage}</span>
+                                </span>
+                                
+                                <button onclick="Store.nextPage()" ${Store.state.products.length < Store.state.productsPerPage ? 'disabled' : ''} class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-all flex items-center gap-2">
+                                    Siguiente <i class="fas fa-chevron-right"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
