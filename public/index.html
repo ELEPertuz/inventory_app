@@ -567,6 +567,7 @@
 
                 // Escucha de Transacciones (Con Paginación)
                 this.subscribeToTransactions();
+                this.subscribeToStagnantProducts();
 
                 // Escucha de Estadísticas Mensuales (Agregación)
                 const now = new Date();
@@ -579,6 +580,60 @@
                     }
                     UI.render();
                 });
+            },
+
+            subscribeToStagnantProducts() {
+                if (this.state.currentStagnantUnsubscribe) this.state.currentStagnantUnsubscribe();
+
+                const threeWeeksAgo = new Date();
+                threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21);
+
+                let qStagnant = query(
+                    collection(db, "products"),
+                    where("lastActivity", "<", threeWeeksAgo),
+                    orderBy("lastActivity", "desc"),
+                    limit(this.state.stagnantPerPage)
+                );
+
+                const cursor = this.state.stagnantCursors[this.state.stagnantPage - 1];
+                if (cursor) {
+                    qStagnant = query(
+                        collection(db, "products"),
+                        where("lastActivity", "<", threeWeeksAgo),
+                        orderBy("lastActivity", "desc"),
+                        startAfter(cursor),
+                        limit(this.state.stagnantPerPage)
+                    );
+                }
+
+                this.state.currentStagnantUnsubscribe = onSnapshot(qStagnant, (snapshot) => {
+                    this.state.stagnantProducts = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data(),
+                        lastActivity: doc.data().lastActivity?.toDate() || null
+                    }));
+
+                    // Guardar cursor para la siguiente página
+                    if (snapshot.docs.length === this.state.stagnantPerPage) {
+                        this.state.stagnantCursors[this.state.stagnantPage] = snapshot.docs[snapshot.docs.length - 1];
+                    }
+
+                    UI.render();
+                });
+            },
+
+            nextStagnantPage() {
+                if (this.state.stagnantProducts.length === this.state.stagnantPerPage) {
+                    this.state.stagnantPage++;
+                    this.subscribeToStagnantProducts();
+                }
+            },
+
+            prevStagnantPage() {
+                if (this.state.stagnantPage > 1) {
+                    this.state.stagnantPage--;
+                    this.subscribeToStagnantProducts();
+                }
             },
 
             async initSession(userId) {
@@ -675,6 +730,7 @@
 
                 try {
                     product.createdAt = serverTimestamp();
+                    product.lastActivity = serverTimestamp(); // Inicialmente la creación es la última actividad
                     await addDoc(collection(db, "products"), product);
                     this.logTransaction('Entrada', `Producto creado: ${product.name}`, product.stock);
                 } catch (e) {
@@ -840,6 +896,14 @@
                         author: this.state.user ? this.state.user.name : 'Sistema',
                         authorId: this.state.user ? this.state.user.id : 'system'
                     });
+
+                    // Si es venta o entrada, actualizar lastActivity del producto
+                    // Buscamos el nombre del producto en la descripción
+                    const product = this.state.products.find(p => description.includes(p.name));
+                    if (product) {
+                        const productRef = doc(db, "products", product.id);
+                        await updateDoc(productRef, { lastActivity: serverTimestamp() });
+                    }
 
                     // Actualizar Agregación Mensual si es Venta
                     if (type === 'Venta') {
@@ -1156,8 +1220,8 @@
 
                 const stats = Store.getStats();
                 const lowStockProducts = stats.lowStockProducts || [];
-                const stagnantProducts = stats.stagnantProductsList || [];
-                const totalNotifications = lowStockProducts.length + stagnantProducts.length;
+                // Quitar productos estancados de las notificaciones como pidió el usuario
+                const totalNotifications = lowStockProducts.length;
                 const hasNotifications = totalNotifications > 0;
 
                 bellContainer.innerHTML = `
@@ -1192,21 +1256,6 @@
                                             <div class="flex-1 min-w-0">
                                                 <p class="text-sm font-medium text-white truncate">${p.name}</p>
                                                 <p class="text-xs text-red-400">Sin existencias (0 unidades)</p>
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                ` : ''}
-
-                                ${stagnantProducts.length > 0 ? `
-                                    <div class="px-2 py-1 text-xs font-semibold text-gray-500 uppercase mt-2">Inventario Estancado (> 3 sem)</div>
-                                    ${stagnantProducts.map(p => `
-                                        <div class="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer" onclick="app.navigate('stagnant')">
-                                            <div class="w-10 h-10 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center flex-shrink-0">
-                                                <i class="fas fa-clock"></i>
-                                            </div>
-                                            <div class="flex-1 min-w-0">
-                                                <p class="text-sm font-medium text-white truncate">${p.name}</p>
-                                                <p class="text-xs text-orange-400">Sin ventas recientes</p>
                                             </div>
                                         </div>
                                     `).join('')}
@@ -1665,16 +1714,18 @@
             },
 
             renderStagnantInventory(container) {
-                const stagnantProducts = Store.getStagnantProducts();
+                const stagnantProducts = Store.state.stagnantProducts;
                 const html = `
             < div class="fade-in space-y-6 h-full flex flex-col" >
-                        <div class="flex items-center gap-4">
-                            <button onclick="app.navigate('dashboard')" class="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
-                                <i class="fas fa-arrow-left"></i>
-                            </button>
-                            <div>
-                                <h2 class="text-2xl font-bold text-white">Inventario Estancado</h2>
-                                <p class="text-gray-400 text-sm">Productos sin ventas en las últimas 3 semanas</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <button onclick="app.navigate('dashboard')" class="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+                                    <i class="fas fa-arrow-left"></i>
+                                </button>
+                                <div>
+                                    <h2 class="text-2xl font-bold text-white">Inventario Estancado</h2>
+                                    <p class="text-gray-400 text-sm">Productos sin ventas en las últimas 3 semanas</p>
+                                </div>
                             </div>
                         </div>
 
@@ -1687,13 +1738,27 @@
                                             <th class="p-4 font-semibold">Categoría</th>
                                             <th class="p-4 font-semibold text-center">Stock</th>
                                             <th class="p-4 font-semibold text-right">Precio</th>
-                                            <th class="p-4 font-semibold text-right">Estado</th>
+                                            <th class="p-4 font-semibold text-right">Última Actividad</th>
                                         </tr>
                                     </thead>
                                     <tbody id="stagnantTableBody" class="divide-y divide-white/5 text-sm">
                                         <!-- Las filas se inyectan aquí -->
                                     </tbody>
                                 </table>
+                            </div>
+
+                            <div class="p-4 border-t border-white/5 bg-white/5 flex justify-between items-center">
+                                <button onclick="Store.prevStagnantPage()" ${Store.state.stagnantPage === 1 ? 'disabled' : ''} class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-all flex items-center gap-2">
+                                    <i class="fas fa-chevron-left"></i> Anterior
+                                </button>
+                                
+                                <span class="text-sm font-medium text-gray-400">
+                                    Página <span class="text-white font-bold">${Store.state.stagnantPage}</span>
+                                </span>
+                                
+                                <button onclick="Store.nextStagnantPage()" ${Store.state.stagnantProducts.length < Store.state.stagnantPerPage ? 'disabled' : ''} class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-all flex items-center gap-2">
+                                    Siguiente <i class="fas fa-chevron-right"></i>
+                                </button>
                             </div>
                         </div>
                     </div >
@@ -1727,8 +1792,8 @@
                                 $${parseFloat(p.price).toFixed(2)}
                             </td>
                             <td class="p-4 text-right">
-                                <span class="px-2 py-1 rounded text-xs font-bold bg-orange-500/20 text-orange-400 border border-orange-500/20">
-                                    Sin Movimiento
+                                <span class="text-gray-400 text-xs">
+                                    ${p.lastActivity ? p.lastActivity.toLocaleDateString() : 'Sin registro'}
                                 </span>
                             </td>
                         </tr >
@@ -1788,6 +1853,34 @@
                     <i class="fas fa-trash-alt"></i>
                     <span class="font-medium">Borrar Todo el Inventario</span>
                 </button>
+            </div>
+
+            <!-- Mantenimiento de Metadatos (Stagnant) -->
+            <div class="glass p-6 rounded-2xl space-y-6 mt-6">
+                <div class="flex items-center gap-4 border-b border-white/10 pb-4">
+                    <div class="p-3 rounded-lg bg-orange-500/10 text-orange-400">
+                        <i class="fas fa-tools text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Mantenimiento de Datos</h3>
+                        <p class="text-sm text-gray-400">Optimiza el rendimiento y actualiza productos antiguos.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <button onclick="app.migrateStagnantMetadata()" class="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-orange-500/10 text-orange-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="fas fa-sync-alt"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-sm font-semibold text-white">Actualizar Metadatos (Stagnant)</p>
+                                <p class="text-xs text-gray-500">Repara la paginación de productos según su actividad</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-600 transition-transform group-hover:translate-x-1"></i>
+                    </button>
+                </div>
             </div>
                     </div >
             `;
@@ -2496,6 +2589,66 @@
                 document.getElementById('loginView').classList.remove('hidden');
                 document.getElementById('mainLayout').classList.add('hidden');
                 document.getElementById('sidebar').classList.add('hidden');
+            }
+            async migrateStagnantMetadata() {
+                const { value: confirm } = await Swal.fire({
+                    title: '¿Actualizar Metadatos?',
+                    text: "Esto añadirá la fecha de 'Última Actividad' a los productos que no la tienen para habilitar la paginación.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, actualizar',
+                    cancelButtonText: 'Cancelar',
+                    background: '#1e293b',
+                    color: '#fff'
+                });
+
+                if (confirm) {
+                    Swal.fire({
+                        title: 'Actualizando...',
+                        didOpen: () => Swal.showLoading(),
+                        allowOutsideClick: false,
+                        background: '#1e293b',
+                        color: '#fff'
+                    });
+
+                    try {
+                        const productsSnapshot = await getDocs(collection(db, "products"));
+                        const batch = writeBatch(db);
+                        let count = 0;
+
+                        productsSnapshot.docs.forEach(docSnap => {
+                            const data = docSnap.data();
+                            if (!data.lastActivity) {
+                                // Usar createdAt si existe, o una fecha muy antigua como fallback
+                                // Para que aparezcan como estancados, usamos una fecha de hace 1 mes
+                                const fallbackDate = data.createdAt ? data.createdAt : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+                                batch.update(doc(db, "products", docSnap.id), {
+                                    lastActivity: fallbackDate
+                                });
+                                count++;
+                            }
+                        });
+
+                        await batch.commit();
+                        Swal.fire({
+                            title: 'Éxito',
+                            text: `Se actualizaron ${count} productos.`,
+                            icon: 'success',
+                            background: '#1e293b',
+                            color: '#fff'
+                        });
+                        Store.subscribeToStagnantProducts();
+                    } catch (e) {
+                        console.error(e);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'No se pudieron actualizar los metadatos.',
+                            icon: 'error',
+                            background: '#1e293b',
+                            color: '#fff'
+                        });
+                    }
+                }
             }
         };
 
